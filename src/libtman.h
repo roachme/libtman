@@ -5,24 +5,6 @@
 #include "errmod.h"
 #include "tree.h"
 
-#define CMDSIZ          5
-#define TMANPATHSIZE    1024
-
-#define FINITSIZ TMANPATHSIZE + 6 + 10  /* filename + padding */
-#define FSTATESIZ TMANPATHSIZE + 6 + 10 /* filename + padding */
-
-struct tmanstruct {
-    char db[TMANPATHSIZE + 1];  /* directory for tman metadata */
-    char cfg[TMANPATHSIZE + 1]; /* directory for config files */
-    char pgn[TMANPATHSIZE + 1]; /* directory for plugin data */
-    char base[TMANPATHSIZE + 1];        /* directory for all stuff above */
-    char pgnins[TMANPATHSIZE + 1];      /* directory for installed plugins */
-
-    char fcfg[TMANPATHSIZE + 1];        /* system config file */
-    char finit[FINITSIZ + 1];   /* file that tells that tman is inited */
-    char fstate[FSTATESIZ + 1]; /* file to store tman task state */
-};
-
 struct tman_arg;
 struct tman_hook;
 struct tman_base;
@@ -70,6 +52,7 @@ struct tman_custom {
     // struct tman_column *column;
 };
 
+/* TODO: maybe it's better to move it cli part?  */
 enum tman_setuplvl {
     LIBTMAN_SETUPSOFT,
     LIBTMAN_SETUPCHECK,
@@ -84,8 +67,6 @@ struct tman_context {
     struct tree *ids;
     struct tree *prjs;
 };
-
-extern struct tmanstruct tmanfs;
 
 /* Core functions.  */
 int tman_setup(int setuplvl);
@@ -140,7 +121,6 @@ int tman_prj_show(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options);
 int tman_prj_sync(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options);
-char *tman_prj_getcurr(struct tman_context *ctx);
 
 /* Task plugin functions.  */
 int tman_ispgn(char *pgndir, const char *pgname);
