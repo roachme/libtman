@@ -54,6 +54,13 @@ static int fill_sysvars(struct tman_base *base)
     return LIBTMAN_OK;
 }
 
+int tman_check_arg_id_exist(struct tman_arg *args)
+{
+    if (task_exist(args->prj, args->id) == FALSE)
+        return FALSE;
+    return TRUE;
+}
+
 int tman_check_arg_id(struct tman_arg *args)
 {
     if (args->id == NULL && (args->id = task_curr(args->prj)) == NULL)

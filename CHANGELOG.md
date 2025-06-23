@@ -3,6 +3,7 @@
 ### Added
 
 - `VERSION`: Add inital version
+- `cli/libtman`: Add function to check if task ID exists
 
 ### Fixed
 
