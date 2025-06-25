@@ -34,9 +34,11 @@ static int addcurr(char *prj, char *id)
     if (curr[0] != '\0') {
         col_set(prj, curr, COLPREV);
         strncpy(prev, curr, IDSIZ);
+        prev[IDSIZ] = '\0';
     }
     col_set(prj, id, COLCURR);
     strncpy(curr, id, IDSIZ);
+    curr[IDSIZ] = '\0';
     return 0;
 }
 
@@ -47,6 +49,7 @@ static int delcurr(char *prj, char *colname)
     if (prev[0] != '\0') {
         col_set(prj, prev, COLCURR);
         strncpy(curr, prev, IDSIZ);
+        curr[IDSIZ] = '\0';
     }
     return 0;
 }
@@ -69,6 +72,7 @@ static int addprev(char *prj, char *id)
         return 1;
     col_set(prj, id, COLPREV);
     strncpy(prev, id, IDSIZ);
+    prev[IDSIZ] = '\0';
     return 0;
 }
 
@@ -80,6 +84,7 @@ static int swap(char *prj)
         return 1;
     }
     strncpy(tmp, prev, IDSIZ);
+    tmp[IDSIZ] = '\0';
     return addcurr(prj, tmp);
 }
 
@@ -142,11 +147,13 @@ static int load(char *prj)
                     prj, ent->d_name);
             continue;
         }
-        if (strncmp(col, COLCURR, IDSIZ) == 0)
+        if (strncmp(col, COLCURR, IDSIZ) == 0) {
             strncpy(curr, ent->d_name, IDSIZ);
-        else if (strncmp(col, COLPREV, IDSIZ) == 0)
+            curr[IDSIZ] = '\0';
+        } else if (strncmp(col, COLPREV, IDSIZ) == 0) {
             strncpy(prev, ent->d_name, IDSIZ);
-        else if (curr[0] != '\0' && prev[0] != '\0')
+            prev[IDSIZ] = '\0';
+        } else if (curr[0] != '\0' && prev[0] != '\0')
             break;
     }
     return closedir(dir);

@@ -8,3 +8,4 @@
 ### Fixed
 
 - `src`: Remove non-public structures
+- `src/task`: Fix memleak in strncpy()
