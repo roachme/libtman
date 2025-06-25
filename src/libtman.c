@@ -178,7 +178,7 @@ int tman_task_show(struct tman_context *ctx, struct tman_arg *args,
     return status;
 }
 
-int tman_task_col(struct tman_context *ctx, struct tman_arg *args, char *tag,
+int tman_task_col(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options)
 {
     int status;
@@ -187,9 +187,9 @@ int tman_task_col(struct tman_context *ctx, struct tman_arg *args, char *tag,
 
     if ((status = check_args(args)))
         return status;
-    else if (col_ext(tag) == FALSE)
+    else if (col_ext(ctx->colname) == FALSE)
         return emod_set(LIBTMAN_COL_EXISTS);
-    else if (task_move(args->prj, args->id, tag))
+    else if (task_move(args->prj, args->id, ctx->colname))
         return emod_set(LIBTMAN_COL_MOVE);
     return LIBTMAN_OK;
 }

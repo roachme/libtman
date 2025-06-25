@@ -9,6 +9,7 @@
 
 - `src/unit`: Remove unit generation
 - `src/unit`: Remove project unit generation
+- `src/libtman`: Move column name no `struct tman_context`
 
 ### Fixed
 

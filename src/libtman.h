@@ -62,6 +62,7 @@ enum tman_setuplvl {
 /* Generic tman structure used by all(?) API functions.  */
 struct tman_context {
     char id[IDSIZ + 1];
+    char *colname;
     struct unit *unitbin;
     struct unit *unitpgn;
     struct tree *ids;
@@ -86,7 +87,7 @@ int tman_check_arg_prj(struct tman_arg *args);
 /* Task ID functions.  */
 int tman_task_add(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options);
-int tman_task_col(struct tman_context *ctx, struct tman_arg *args, char *tag,
+int tman_task_col(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options);
 int tman_task_del(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options);
