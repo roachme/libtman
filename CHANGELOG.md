@@ -8,6 +8,7 @@
 ### Changed
 
 - `src/unit`: Remove unit generation
+- `src/unit`: Remove project unit generation
 
 ### Fixed
 

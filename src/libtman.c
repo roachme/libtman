@@ -371,10 +371,10 @@ int tman_prj_add(struct tman_context *ctx, struct tman_arg *args,
 
     if (dir_prj_add(tmanfs.base, args->prj))
         return emod_set(LIBTMAN_DIR_PRJ_MAKE);
-    else if (unit_generate_prj(args->prj))
-        return emod_set(LIBTMAN_UNIT_MAKE);
     else if (options->prj_switch == TRUE && project_addcurr(args->prj))
         return emod_set(LIBTMAN_PRJ_SWITCH);
+    else if (unit_save(genpath_unit_prj(args->prj), ctx->unitbin))
+        return emod_set(LIBTMAN_UNIT_SET);
     return LIBTMAN_OK;
 }
 
