@@ -146,8 +146,6 @@ int tman_task_add(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options)
 {
     int status;
-    // TODO: Add support to pass unit values into unit_add()
-    // TODO: maybe it's better to move units to ctx?
 
     /* Special case: task ID should not exists. If this's a case - let it go. */
     if ((status = check_args(args)) && status != LIBTMAN_ID_NOSUCH)
@@ -157,13 +155,12 @@ int tman_task_add(struct tman_context *ctx, struct tman_arg *args,
 
     if (dir_id_add(tmanfs.base, args->prj, args->id) != 0)
         return emod_set(LIBTMAN_DIR_ID_MAKE);
-    else if (unit_generate(args->prj, args->id))
-        return emod_set(LIBTMAN_UNIT_MAKE);
     else if (task_add(args->prj, args->id))
         return emod_set(LIBTMAN_COL_ADD);
-    else if (options->id_switch == TRUE
-             && task_move(args->prj, args->id, COLCURR))
+    else if (options->id_switch && task_move(args->prj, args->id, COLCURR))
         return emod_set(LIBTMAN_COL_MOVE);
+    else if (unit_save(genpath_unit(args->prj, args->id), ctx->unitbin))
+        return emod_set(LIBTMAN_UNIT_SET);
     return LIBTMAN_OK;
 }
 
