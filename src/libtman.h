@@ -123,11 +123,6 @@ int tman_prj_show(struct tman_context *ctx, struct tman_arg *args,
 int tman_prj_sync(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options);
 
-/* Task plugin functions.  */
-int tman_ispgn(char *pgndir, const char *pgname);
-int tman_pgnexec(struct tman_context *ctx, struct tman_arg *args, char *pgname,
-                 char *pgncmd, struct tman_option *options);
-
 int tman_hook_action(struct tman_context *ctx, struct tman_hook *hooks,
                      struct tman_arg *args, char *cmd);
 struct unit *tman_hook_show(struct tman_context *ctx, struct tman_hook *hooks,

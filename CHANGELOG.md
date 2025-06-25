@@ -14,3 +14,7 @@
 
 - `src`: Remove non-public structures
 - `src/task`: Fix memleak in strncpy()
+
+### Deleted
+
+- `src`: Delete unused API functions

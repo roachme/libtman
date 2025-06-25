@@ -543,26 +543,6 @@ int tman_prj_sync(struct tman_context *ctx, struct tman_arg *args,
     return LIBTMAN_OK;
 }
 
-// TODO: move it to cli part
-int tman_ispgn(char *pgndir, const char *pgname)
-{
-    return ispgn(pgndir, pgname);
-}
-
-// TODO: move it to cli part
-int tman_pgnexec(struct tman_context *ctx, struct tman_arg *args, char *pgname,
-                 char *pgncmd, struct tman_option *options)
-{
-    int status;
-
-    if ((status = check_args(args)))
-        return status;
-
-    if (system(genpath_pgn(args->prj, args->id, pgname, pgncmd)))
-        return emod_set(LIBTMAN_EPGN);
-    return LIBTMAN_OK;
-}
-
 struct unit *tman_hook_show(struct tman_context *ctx, struct tman_hook *hooks,
                             struct tman_arg *args, char *cmd)
 {

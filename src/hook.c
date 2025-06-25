@@ -4,14 +4,6 @@
 
 #include "hook.h"
 #include "unit.h"
-#include "osdep.h"
-
-int ispgn(char *pgndir, const char *pgname)
-{
-    char path[PATHSIZ + 1];
-    sprintf(path, "%s/%s/%s", pgndir, pgname, pgname);
-    return ISFILE(path);
-}
 
 int hookact(struct tman_hook *hooks, char *cmd, char *prj, char *id)
 {
