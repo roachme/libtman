@@ -13,14 +13,6 @@ char *genpath_prj(char *prj)
     return pathname;
 }
 
-char *genpath_pgn(char *prj, char *id, char *name, char *cmd)
-{
-    const char *fmt = "%s/%s/%s -p %s -i %s -T %s -P %s %s";
-    sprintf(pathname, fmt, tmanfs.pgnins, name, name, prj, id, tmanfs.base,
-            tmanfs.pgnins, cmd);
-    return pathname;
-}
-
 char *genpath_full(char *prj, char *id)
 {
     sprintf(pathname, "%s/%s/%s", base, prj, id);

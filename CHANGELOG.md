@@ -23,3 +23,4 @@
 
 - `src`: Delete unused API functions
 - `src`: Move hooks to CLI part
+- `src/common`: Remove plugin command generation
