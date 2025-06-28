@@ -4,11 +4,11 @@
 #include "errmod.h"
 #include "tree.h"
 
-struct tman_arg;
-struct tman_base;
-struct tman_unit;
-struct tman_option;
-struct tman_context;
+typedef struct tman_arg tman_arg_t;
+typedef struct tman_base tman_base_t;
+typedef struct tman_unit tman_unit_t;
+typedef struct tman_option tman_opt_t;
+typedef struct tman_context tman_ctx_t;
 
 struct tman_arg {
     char *id;
@@ -52,57 +52,42 @@ struct tman_context {
 
 /* Core functions.  */
 int tman_setup(int setuplvl);
-struct tman_context *tman_init(struct tman_base *structure);
-struct tman_context *tman_deinit(struct tman_context *ctx);
+tman_ctx_t *tman_init(tman_base_t * structure);
+tman_ctx_t *tman_deinit(tman_ctx_t * ctx);
 
 /* Core util functions.  */
 int tman_mkfs(void);
 const char *tman_strerror(void);
 
+/* Date structure.  */
+tman_unit_t *tman_unit_add(tman_unit_t * head, char *key, char *val);
+void *tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+
 /* Input irguments functions.  */
-int tman_check_arg_id(struct tman_arg *args);
-int tman_check_arg_id_exist(struct tman_arg *args);
-int tman_check_arg_brd(struct tman_arg *args);
-int tman_check_arg_prj(struct tman_arg *args);
+int tman_check_arg_id(tman_arg_t * args);
+int tman_check_arg_id_exist(tman_arg_t * args);
+int tman_check_arg_brd(tman_arg_t * args);
+int tman_check_arg_prj(tman_arg_t * args);
 
 /* Task ID functions.  */
-int tman_task_add(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_option *options);
-int tman_task_col(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_option *options);
-int tman_task_del(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_option *options);
-int tman_task_list(struct tman_context *ctx, struct tman_arg *args,
-                   struct tman_option *options);
-int tman_task_move(struct tman_context *ctx, struct tman_arg *src,
-                   struct tman_arg *dst);
-int tman_task_prev(struct tman_context *ctx, struct tman_arg *args,
-                   struct tman_option *options);
-int tman_task_set(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_unit *unitbin, struct tman_option *options);
-int tman_task_show(struct tman_context *ctx, struct tman_arg *args,
-                   struct tman_option *options);
-int tman_task_sync(struct tman_context *ctx, struct tman_arg *args,
-                   struct tman_option *options);
-
-struct tman_unit *tman_unit_add(struct tman_unit *head, char *key, char *val);
-void *tman_unit_free(struct tman_context *ctx, struct tman_arg *args,
-                     struct tman_option *options);
+int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_task_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst);
+int tman_task_prev(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
 
 /* Task project functions.  */
-int tman_prj_add(struct tman_context *ctx, struct tman_arg *args,
-                 struct tman_option *options);
-int tman_prj_del(struct tman_context *ctx, struct tman_arg *args,
-                 struct tman_option *options);
-int tman_prj_list(struct tman_context *ctx, struct tman_option *options);
-int tman_prj_prev(struct tman_context *ctx, struct tman_option *options);
-int tman_prj_rename(struct tman_context *ctx, struct tman_arg *src,
-                    struct tman_arg *dst);
-int tman_prj_set(struct tman_context *ctx, struct tman_arg *args,
-                 struct tman_unit *unitbin, struct tman_option *options);
-int tman_prj_show(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_option *options);
-int tman_prj_sync(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_option *options);
+int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * options);
+int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * options);
+int tman_prj_rename(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst);
+int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
 
 #endif

@@ -17,7 +17,7 @@
 // TODO: Make NOT global.
 struct tmanstruct tmanfs;
 
-static int check_args(struct tman_arg *args)
+static int check_args(tman_arg_t * args)
 {
     int status;
 
@@ -30,18 +30,18 @@ static int check_args(struct tman_arg *args)
     return status;
 }
 
-static struct tman_context *make_context(void)
+static tman_ctx_t *make_context(void)
 {
-    struct tman_context *ctx;
+    tman_ctx_t *ctx;
 
-    if ((ctx = malloc(sizeof(struct tman_context))) == NULL)
+    if ((ctx = malloc(sizeof(tman_ctx_t))) == NULL)
         return NULL;
 
-    memset(ctx, 0, sizeof(struct tman_context));
+    memset(ctx, 0, sizeof(tman_ctx_t));
     return ctx;
 }
 
-static int fill_sysvars(struct tman_base *base)
+static int fill_sysvars(tman_base_t * base)
 {
     sprintf(tmanfs.base, "%s", base->task);
     sprintf(tmanfs.db, "%s/%s", base->task, ".tman");
@@ -52,14 +52,14 @@ static int fill_sysvars(struct tman_base *base)
     return LIBTMAN_OK;
 }
 
-int tman_check_arg_id_exist(struct tman_arg *args)
+int tman_check_arg_id_exist(tman_arg_t * args)
 {
     if (task_exist(args->prj, args->id) == FALSE)
         return FALSE;
     return TRUE;
 }
 
-int tman_check_arg_id(struct tman_arg *args)
+int tman_check_arg_id(tman_arg_t * args)
 {
     if (args->id == NULL && (args->id = task_curr(args->prj)) == NULL)
         return emod_set(LIBTMAN_ID_NOCURR);
@@ -72,13 +72,13 @@ int tman_check_arg_id(struct tman_arg *args)
     return LIBTMAN_OK;
 }
 
-int tman_check_arg_brd(struct tman_arg *args)
+int tman_check_arg_brd(tman_arg_t * args)
 {
     /* TODO: add board name checks.  */
     return LIBTMAN_OK;
 }
 
-int tman_check_arg_prj(struct tman_arg *args)
+int tman_check_arg_prj(tman_arg_t * args)
 {
     if (args->prj == NULL && (args->prj = project_getcurr()) == NULL)
         return emod_set(LIBTMAN_PRJ_NOCURR);
@@ -110,7 +110,7 @@ int tman_mkfs(void)
     return LIBTMAN_OK;
 }
 
-struct tman_context *tman_init(struct tman_base *base)
+tman_ctx_t *tman_init(tman_base_t * base)
 {
     if (fill_sysvars(base)) {
         emod_set(LIBTMAN_ESYSVAR);
@@ -140,8 +140,7 @@ int tman_setup(int setuplvl)
     return status;
 }
 
-int tman_task_add(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_option *options)
+int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
 
@@ -162,8 +161,7 @@ int tman_task_add(struct tman_context *ctx, struct tman_arg *args,
     return LIBTMAN_OK;
 }
 
-int tman_task_show(struct tman_context *ctx, struct tman_arg *args,
-                   struct tman_option *options)
+int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
 
@@ -176,8 +174,7 @@ int tman_task_show(struct tman_context *ctx, struct tman_arg *args,
     return status;
 }
 
-int tman_task_col(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_option *options)
+int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
 
@@ -192,8 +189,7 @@ int tman_task_col(struct tman_context *ctx, struct tman_arg *args,
     return LIBTMAN_OK;
 }
 
-int tman_task_del(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_option *options)
+int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
 
@@ -212,8 +208,7 @@ int tman_task_del(struct tman_context *ctx, struct tman_arg *args,
  @param prj char * | NULL (then list the current project)
  @return struct item * | NULL (if error happened)
 */
-int tman_task_list(struct tman_context *ctx, struct tman_arg *args,
-                   struct tman_option *options)
+int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     DIR *ids;
     int status;
@@ -257,8 +252,7 @@ int tman_task_list(struct tman_context *ctx, struct tman_arg *args,
     return LIBTMAN_OK;
 }
 
-int tman_task_move(struct tman_context *ctx, struct tman_arg *src,
-                   struct tman_arg *dst)
+int tman_task_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
 {
     int status;
 
@@ -286,8 +280,7 @@ int tman_task_move(struct tman_context *ctx, struct tman_arg *src,
     return LIBTMAN_OK;
 }
 
-int tman_task_prev(struct tman_context *ctx, struct tman_arg *args,
-                   struct tman_option *options)
+int tman_task_prev(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
 
@@ -310,15 +303,13 @@ struct tman_unit *tman_unit_add(struct tman_unit *head, char *key, char *val)
     return unit_add(head, key, val);
 }
 
-void *tman_unit_free(struct tman_context *ctx, struct tman_arg *args,
-                     struct tman_option *options)
+void *tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     unit_free(ctx->unitbin);
     return ctx->unitbin = NULL;
 }
 
-int tman_task_set(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_unit *unitbin, struct tman_option *options)
+int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
     struct tman_unit *item;
@@ -330,7 +321,7 @@ int tman_task_set(struct tman_context *ctx, struct tman_arg *args,
     else if ((units = unit_load(genpath_unit(args->prj, args->id))) == NULL)
         return emod_set(LIBTMAN_NODEF_ERR);
 
-    for (item = unitbin; item; item = item->next) {
+    for (item = ctx->unitbin; item; item = item->next) {
         unit_set(units, item->key, item->val);
     }
     if (unit_save(genpath_unit(args->prj, args->id), units))
@@ -339,8 +330,7 @@ int tman_task_set(struct tman_context *ctx, struct tman_arg *args,
     return LIBTMAN_OK;
 }
 
-int tman_task_sync(struct tman_context *ctx, struct tman_arg *args,
-                   struct tman_option *options)
+int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
 
@@ -356,8 +346,7 @@ int tman_task_sync(struct tman_context *ctx, struct tman_arg *args,
     return LIBTMAN_OK;
 }
 
-int tman_prj_add(struct tman_context *ctx, struct tman_arg *args,
-                 struct tman_option *options)
+int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
 
@@ -376,8 +365,7 @@ int tman_prj_add(struct tman_context *ctx, struct tman_arg *args,
     return LIBTMAN_OK;
 }
 
-int tman_prj_del(struct tman_context *ctx, struct tman_arg *args,
-                 struct tman_option *options)
+int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
 
@@ -396,7 +384,7 @@ int tman_prj_del(struct tman_context *ctx, struct tman_arg *args,
 /*
  * roachme: Refactor this shit
 */
-int tman_prj_list(struct tman_context *ctx, struct tman_option *options)
+int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * options)
 {
     DIR *edir;
     struct tman_unit *units;
@@ -404,7 +392,7 @@ int tman_prj_list(struct tman_context *ctx, struct tman_option *options)
     struct tree *node;
     int colprio = 1;
     char *cprj, *pprj;
-    struct tman_arg args;
+    tman_arg_t args;
     char pgnout[PGNOUTSIZ + 1] = { 0 };
 
     if ((edir = opendir(tmanfs.base)) == NULL)
@@ -446,10 +434,10 @@ int tman_prj_list(struct tman_context *ctx, struct tman_option *options)
     return LIBTMAN_OK;
 }
 
-int tman_prj_prev(struct tman_context *ctx, struct tman_option *options)
+int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * options)
 {
     int status;
-    struct tman_arg args;
+    tman_arg_t args;
 
     args.brd = args.id = NULL;
     if ((args.prj = project_getcurr()) && (status = tman_check_arg_prj(&args)))
@@ -461,8 +449,7 @@ int tman_prj_prev(struct tman_context *ctx, struct tman_option *options)
     return LIBTMAN_OK;
 }
 
-int tman_prj_rename(struct tman_context *ctx, struct tman_arg *src,
-                    struct tman_arg *dst)
+int tman_prj_rename(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
 {
     int status;
 
@@ -493,8 +480,7 @@ int tman_prj_rename(struct tman_context *ctx, struct tman_arg *src,
     return dir_prj_rename(tmanfs.base, src->prj, dst->prj);
 }
 
-int tman_prj_set(struct tman_context *ctx, struct tman_arg *args,
-                 struct tman_unit *unitbin, struct tman_option *options)
+int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
     struct tman_unit *item;
@@ -505,7 +491,7 @@ int tman_prj_set(struct tman_context *ctx, struct tman_arg *args,
     else if ((units = unit_load(genpath_unit_prj(args->prj))) == NULL)
         return emod_set(LIBTMAN_NODEF_ERR);
 
-    for (item = unitbin; item; item = item->next) {
+    for (item = ctx->unitbin; item; item = item->next) {
         unit_set(units, item->key, item->val);
     }
     if (unit_save(genpath_unit_prj(args->prj), units))
@@ -514,8 +500,7 @@ int tman_prj_set(struct tman_context *ctx, struct tman_arg *args,
     return LIBTMAN_OK;
 }
 
-int tman_prj_show(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_option *options)
+int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
 
@@ -526,8 +511,7 @@ int tman_prj_show(struct tman_context *ctx, struct tman_arg *args,
     return LIBTMAN_OK;
 }
 
-int tman_prj_sync(struct tman_context *ctx, struct tman_arg *args,
-                  struct tman_option *options)
+int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 {
     int status;
 
@@ -546,7 +530,7 @@ const char *tman_strerror(void)
     return emod_strerror();
 }
 
-struct tman_context *tman_deinit(struct tman_context *ctx)
+tman_ctx_t *tman_deinit(tman_ctx_t * ctx)
 {
     unit_free(ctx->unitbin);
     unit_free(ctx->unitpgn);

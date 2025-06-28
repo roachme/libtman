@@ -17,6 +17,7 @@
 - `src/task`: Fix memleak in strncpy()
 - `src`: Fix access to private structures
 - `src/common`: Add missing option `-P` for hook calls
+- `src/libtman`: Replace struct with typedef
 
 ### Deleted
 
