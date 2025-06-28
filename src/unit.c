@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include "unit.h"
-#include "unit.h"
 
 int unit_save(char *filename, struct tman_unit *units)
 {

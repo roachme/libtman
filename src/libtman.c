@@ -6,12 +6,10 @@
 #include "col.h"
 #include "dir.h"
 #include "project.h"
-#include "hook.h"
 #include "unit.h"
 #include "libtman.h"
 #include "tree.h"
 #include "task.h"
-#include "unit.h"
 #include "common.h"
 #include "osdep.h"
 #include "errmod.h"
@@ -541,38 +539,6 @@ int tman_prj_sync(struct tman_context *ctx, struct tman_arg *args,
     if (project_addcurr(args->prj))
         return emod_set(LIBTMAN_PRJ_SWITCH);
     return LIBTMAN_OK;
-}
-
-struct tman_unit *tman_hook_show(struct tman_context *ctx,
-                                 struct tman_hook *hooks, struct tman_arg *args,
-                                 char *cmd)
-{
-    // roach
-    // todo: if no hooks are executed then what?
-    ctx->unitpgn = hookshow(hooks, args->prj, args->id, cmd);
-    return ctx->unitpgn;
-}
-
-int tman_hook_action(struct tman_context *ctx, struct tman_hook *hooks,
-                     struct tman_arg *args, char *cmd)
-{
-    return hookact(hooks, cmd, args->prj, args->id);
-}
-
-/*
- * NOTE: pro'ly redundant cuz hook_action doesn't alloc memory
-int tman_hook_action_free(struct tman_context *ctx, struct tman_arg *args,
-                          char *cmd)
-{
-    return 0;
-}
-*/
-
-struct tman_unit *tman_hook_show_free(struct tman_context *ctx,
-                                      struct tman_arg *args)
-{
-    unit_free(ctx->unitpgn);
-    return NULL;
 }
 
 const char *tman_strerror(void)

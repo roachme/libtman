@@ -21,3 +21,4 @@
 ### Deleted
 
 - `src`: Delete unused API functions
+- `src`: Move hooks to CLI part

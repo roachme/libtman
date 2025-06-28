@@ -5,27 +5,15 @@
 #include "tree.h"
 
 struct tman_arg;
-struct tman_hook;
 struct tman_base;
 struct tman_unit;
 struct tman_option;
-struct tman_custom;
 struct tman_context;
 
 struct tman_arg {
     char *id;
     char *brd;
     char *prj;
-};
-
-struct tman_hook {
-    char cmd[10];
-    char cmdopt[10];
-    char pgntag[10];
-    char pgname[10];
-    char pgncmd[10];
-    char pgnopt[10];
-    struct tman_hook *next;
 };
 
 struct tman_base {
@@ -43,12 +31,6 @@ struct tman_option {
     int id_switch;
     int id_generate;
     int prj_switch;
-};
-
-struct tman_custom {
-    struct tman_hook *hooks;
-    // struct tman_prios *prios;
-    // struct tman_column *column;
 };
 
 /* TODO: maybe it's better to move it cli part?  */
@@ -122,16 +104,5 @@ int tman_prj_show(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options);
 int tman_prj_sync(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options);
-
-int tman_hook_action(struct tman_context *ctx, struct tman_hook *hooks,
-                     struct tman_arg *args, char *cmd);
-struct tman_unit *tman_hook_show(struct tman_context *ctx,
-                                 struct tman_hook *hooks, struct tman_arg *args,
-                                 char *cmd);
-
-int tman_hook_action_free(struct tman_context *ctx, struct tman_arg *args,
-                          char *cmd);
-struct tman_unit *tman_hook_show_free(struct tman_context *ctx,
-                                      struct tman_arg *args);
 
 #endif

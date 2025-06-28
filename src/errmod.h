@@ -12,7 +12,6 @@ enum tman_err_enum {
     LIBTMAN_EFINIT,
     LIBTMAN_EMKDIR,
     LIBTMAN_ECONF,
-    LIBTMAN_EHOOK,              /* Failed to execute hook */
     LIBTMAN_EPGN,               /* Failed to execute plugin */
     LIBTMAN_EOPENPRJDIR,
     LIBTMAN_EINIT_PRJMOD,

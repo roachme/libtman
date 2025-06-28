@@ -14,7 +14,6 @@ const char *errcodes[__LIBTMAN_STATUS_LAST] = {
     [LIBTMAN_EFINIT] = "could not init",
     [LIBTMAN_EMKDIR] = "could not make directory",
     [LIBTMAN_ECONF] = "error to parse config",
-    [LIBTMAN_EHOOK] = "failed to execute hook",
     [LIBTMAN_EPGN] = "failed to execute plugin command",
     [LIBTMAN_EOPENPRJDIR] = "could not open project directory",
     [LIBTMAN_EINIT_PRJMOD] = "could not init module prj",
