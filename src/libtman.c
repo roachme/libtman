@@ -221,7 +221,7 @@ int tman_task_list(struct tman_context *ctx, struct tman_arg *args,
     int status;
     struct dirent *ent;
     struct tree *node;
-    struct unit *units;
+    struct tman_unit *units;
 
     // TODO: move to to cli part
     /* Free task ID list because it might be called more than once.  */
@@ -307,7 +307,7 @@ int tman_task_prev(struct tman_context *ctx, struct tman_arg *args,
     return check_args(args);
 }
 
-struct unit *tman_unit_add(struct unit *head, char *key, char *val)
+struct tman_unit *tman_unit_add(struct tman_unit *head, char *key, char *val)
 {
     return unit_add(head, key, val);
 }
@@ -320,11 +320,11 @@ void *tman_unit_free(struct tman_context *ctx, struct tman_arg *args,
 }
 
 int tman_task_set(struct tman_context *ctx, struct tman_arg *args,
-                  struct unit *unitbin, struct tman_option *options)
+                  struct tman_unit *unitbin, struct tman_option *options)
 {
     int status;
-    struct unit *item;
-    struct unit *units;
+    struct tman_unit *item;
+    struct tman_unit *units;
 
     // TODO: move genpath_unit to a variable to not call it twice
     if ((status = check_args(args)))
@@ -401,7 +401,7 @@ int tman_prj_del(struct tman_context *ctx, struct tman_arg *args,
 int tman_prj_list(struct tman_context *ctx, struct tman_option *options)
 {
     DIR *edir;
-    struct unit *units;
+    struct tman_unit *units;
     struct dirent *ent;
     struct tree *node;
     int colprio = 1;
@@ -496,11 +496,11 @@ int tman_prj_rename(struct tman_context *ctx, struct tman_arg *src,
 }
 
 int tman_prj_set(struct tman_context *ctx, struct tman_arg *args,
-                 struct unit *unitbin, struct tman_option *options)
+                 struct tman_unit *unitbin, struct tman_option *options)
 {
     int status;
-    struct unit *item;
-    struct unit *units;
+    struct tman_unit *item;
+    struct tman_unit *units;
 
     if ((status = tman_check_arg_prj(args)))
         return status;
@@ -543,8 +543,9 @@ int tman_prj_sync(struct tman_context *ctx, struct tman_arg *args,
     return LIBTMAN_OK;
 }
 
-struct unit *tman_hook_show(struct tman_context *ctx, struct tman_hook *hooks,
-                            struct tman_arg *args, char *cmd)
+struct tman_unit *tman_hook_show(struct tman_context *ctx,
+                                 struct tman_hook *hooks, struct tman_arg *args,
+                                 char *cmd)
 {
     // roach
     // todo: if no hooks are executed then what?
@@ -567,8 +568,8 @@ int tman_hook_action_free(struct tman_context *ctx, struct tman_arg *args,
 }
 */
 
-struct unit *tman_hook_show_free(struct tman_context *ctx,
-                                 struct tman_arg *args)
+struct tman_unit *tman_hook_show_free(struct tman_context *ctx,
+                                      struct tman_arg *args)
 {
     unit_free(ctx->unitpgn);
     return NULL;

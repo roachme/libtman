@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include "unit.h"
-#include "common.h"
+#include "unit.h"
 
-int unit_save(char *filename, struct unit *units)
+int unit_save(char *filename, struct tman_unit *units)
 {
     FILE *fp;
 
@@ -20,10 +20,10 @@ int unit_save(char *filename, struct unit *units)
 /*
  * Get units all units.
 */
-struct unit *unit_load(char *filename)
+struct tman_unit *unit_load(char *filename)
 {
     FILE *fp;
-    struct unit *units;
+    struct tman_unit *units;
     char buf[BUFSIZ + 1];
     char key[KEYSIZ + 1];
     char val[VALSIZ + 1];
@@ -48,11 +48,11 @@ struct unit *unit_load(char *filename)
 /*
  * Add units one at a time.
 */
-struct unit *unit_add(struct unit *head, char *key, char *val)
+struct tman_unit *unit_add(struct tman_unit *head, char *key, char *val)
 {
-    struct unit *unit, *tmp;
+    struct tman_unit *unit, *tmp;
 
-    if ((unit = malloc(sizeof(struct unit))) == NULL)
+    if ((unit = malloc(sizeof(struct tman_unit))) == NULL)
         return head;
 
     unit->next = NULL;
@@ -70,7 +70,7 @@ struct unit *unit_add(struct unit *head, char *key, char *val)
 /*
  * Set units one at a time.
 */
-int unit_set(struct unit *head, char *key, char *val)
+int unit_set(struct tman_unit *head, char *key, char *val)
 {
     for (; head != NULL; head = head->next) {
         if (strcmp(head->key, key) == 0) {
@@ -82,7 +82,7 @@ int unit_set(struct unit *head, char *key, char *val)
     return 1;
 }
 
-char *unit_get(struct unit *head, char *key)
+char *unit_get(struct tman_unit *head, char *key)
 {
     while (head) {
         if (strcmp(head->key, key) == 0)
@@ -95,9 +95,9 @@ char *unit_get(struct unit *head, char *key)
 /*
  * Delete all units.
 */
-void unit_free(struct unit *units)
+void unit_free(struct tman_unit *units)
 {
-    struct unit *tmp;
+    struct tman_unit *tmp;
 
     while (units) {
         tmp = units->next;

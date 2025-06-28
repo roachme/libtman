@@ -1,7 +1,6 @@
 #ifndef LIBTMAN_H
 #define LIBTMAN_H
 
-#include "unit.h"
 #include "errmod.h"
 #include "tree.h"
 
@@ -37,7 +36,7 @@ struct tman_base {
 struct tman_unit {
     char *key;
     char *val;
-    struct unit *next;
+    struct tman_unit *next;
 };
 
 struct tman_option {
@@ -63,8 +62,8 @@ enum tman_setuplvl {
 struct tman_context {
     char id[IDSIZ + 1];
     char *colname;
-    struct unit *unitbin;
-    struct unit *unitpgn;
+    struct tman_unit *unitbin;
+    struct tman_unit *unitpgn;
     struct tree *ids;
     struct tree *prjs;
 };
@@ -98,13 +97,13 @@ int tman_task_move(struct tman_context *ctx, struct tman_arg *src,
 int tman_task_prev(struct tman_context *ctx, struct tman_arg *args,
                    struct tman_option *options);
 int tman_task_set(struct tman_context *ctx, struct tman_arg *args,
-                  struct unit *unitbin, struct tman_option *options);
+                  struct tman_unit *unitbin, struct tman_option *options);
 int tman_task_show(struct tman_context *ctx, struct tman_arg *args,
                    struct tman_option *options);
 int tman_task_sync(struct tman_context *ctx, struct tman_arg *args,
                    struct tman_option *options);
 
-struct unit *tman_unit_add(struct unit *head, char *key, char *val);
+struct tman_unit *tman_unit_add(struct tman_unit *head, char *key, char *val);
 void *tman_unit_free(struct tman_context *ctx, struct tman_arg *args,
                      struct tman_option *options);
 
@@ -118,7 +117,7 @@ int tman_prj_prev(struct tman_context *ctx, struct tman_option *options);
 int tman_prj_rename(struct tman_context *ctx, struct tman_arg *src,
                     struct tman_arg *dst);
 int tman_prj_set(struct tman_context *ctx, struct tman_arg *args,
-                 struct unit *unitbin, struct tman_option *options);
+                 struct tman_unit *unitbin, struct tman_option *options);
 int tman_prj_show(struct tman_context *ctx, struct tman_arg *args,
                   struct tman_option *options);
 int tman_prj_sync(struct tman_context *ctx, struct tman_arg *args,
@@ -126,12 +125,13 @@ int tman_prj_sync(struct tman_context *ctx, struct tman_arg *args,
 
 int tman_hook_action(struct tman_context *ctx, struct tman_hook *hooks,
                      struct tman_arg *args, char *cmd);
-struct unit *tman_hook_show(struct tman_context *ctx, struct tman_hook *hooks,
-                            struct tman_arg *args, char *cmd);
+struct tman_unit *tman_hook_show(struct tman_context *ctx,
+                                 struct tman_hook *hooks, struct tman_arg *args,
+                                 char *cmd);
 
 int tman_hook_action_free(struct tman_context *ctx, struct tman_arg *args,
                           char *cmd);
-struct unit *tman_hook_show_free(struct tman_context *ctx,
-                                 struct tman_arg *args);
+struct tman_unit *tman_hook_show_free(struct tman_context *ctx,
+                                      struct tman_arg *args);
 
 #endif

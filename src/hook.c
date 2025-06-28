@@ -16,13 +16,14 @@ int hookact(struct tman_hook *hooks, char *cmd, char *prj, char *id)
     return 0;
 }
 
-struct unit *hookshow(struct tman_hook *hooks, char *prj, char *id, char *cmd)
+struct tman_unit *hookshow(struct tman_hook *hooks, char *prj, char *id,
+                           char *cmd)
 {
     FILE *pipe;
     char key[KEYSIZ + 1];
     char val[VALSIZ + 1];
     char line[BUFSIZ + 1] = { 0 };
-    struct unit *unitpgn = NULL;
+    struct tman_unit *unitpgn = NULL;
 
     for (; hooks; hooks = hooks->next) {
         if (strcmp(hooks->cmd, cmd) != 0)
