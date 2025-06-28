@@ -16,6 +16,7 @@
 - `src`: Remove non-public structures
 - `src/task`: Fix memleak in strncpy()
 - `src`: Fix access to private structures
+- `src/common`: Add missing option `-P` for hook calls
 
 ### Deleted
 
