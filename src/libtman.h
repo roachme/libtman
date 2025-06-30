@@ -29,6 +29,7 @@ struct tman_unit {
 
 struct tman_option {
     int id_switch;
+    int brd_switch;
     int prj_switch;
 };
 
@@ -79,7 +80,17 @@ int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
 int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
 int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
 
-/* Task project functions.  */
+/* Board functions.  */
+int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * options);
+int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * options);
+int tman_prj_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst);
+int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+
+/* Project functions.  */
 int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
 int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
 int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * options);

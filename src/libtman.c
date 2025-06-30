@@ -525,6 +525,46 @@ int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
     return LIBTMAN_OK;
 }
 
+int tman_brd_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+{
+    return 0;
+}
+
+int tman_brd_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+{
+    return 0;
+}
+
+int tman_brd_list(tman_ctx_t * ctx, tman_opt_t * options)
+{
+    return 0;
+}
+
+int tman_brd_prev(tman_ctx_t * ctx, tman_opt_t * options)
+{
+    return 0;
+}
+
+int tman_brd_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
+{
+    return 0;
+}
+
+int tman_brd_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+{
+    return 0;
+}
+
+int tman_brd_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+{
+    return 0;
+}
+
+int tman_brd_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+{
+    return 0;
+}
+
 const char *tman_strerror(void)
 {
     return emod_strerror();
