@@ -29,7 +29,6 @@ struct tman_unit {
 
 struct tman_option {
     int id_switch;
-    int id_generate;
     int prj_switch;
 };
 
