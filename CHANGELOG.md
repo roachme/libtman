@@ -26,3 +26,4 @@
 - `src`: Move hooks to CLI part
 - `src/common`: Remove plugin command generation
 - `src/libtman`: Delete unused member in struct option
+- `src/libtman`: Delete id member from `tman_ctx_t`

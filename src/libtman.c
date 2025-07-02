@@ -168,7 +168,6 @@ int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
     if ((status = check_args(args)))
         return status;
 
-    strncpy(ctx->id, args->id, IDSIZ);
     if ((ctx->unitbin = unit_load(genpath_unit(args->prj, args->id))) == NULL)
         status = LIBTMAN_UNIT_GET;
     return status;

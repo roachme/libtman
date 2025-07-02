@@ -42,7 +42,6 @@ enum tman_setuplvl {
 
 /* Generic tman structure used by all(?) API functions.  */
 struct tman_context {
-    char id[IDSIZ + 1];
     char *colname;
     struct tman_unit *unitbin;
     struct tman_unit *unitpgn;
