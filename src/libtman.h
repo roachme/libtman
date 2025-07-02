@@ -58,17 +58,17 @@ tman_ctx_t *tman_deinit(tman_ctx_t * ctx);
 int tman_mkfs(void);
 const char *tman_strerror(void);
 
-/* Date structure.  */
+/* Data structure.  */
 tman_unit_t *tman_unit_add(tman_unit_t * head, char *key, char *val);
 void *tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 
-/* Input irguments functions.  */
+/* Input argument functions.  */
 int tman_check_arg_id(tman_arg_t * args);
 int tman_check_arg_id_exist(tman_arg_t * args);
 int tman_check_arg_brd(tman_arg_t * args);
 int tman_check_arg_prj(tman_arg_t * args);
 
-/* Task ID functions.  */
+/* Task functions.  */
 int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
