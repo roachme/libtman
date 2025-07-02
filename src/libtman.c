@@ -140,7 +140,7 @@ int tman_setup(int setuplvl)
     return status;
 }
 
-int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
@@ -154,14 +154,14 @@ int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
         return emod_set(LIBTMAN_DIR_ID_MAKE);
     else if (task_add(args->prj, args->id))
         return emod_set(LIBTMAN_COL_ADD);
-    else if (options->id_switch && task_move(args->prj, args->id, COLCURR))
+    else if (opts->id_switch && task_move(args->prj, args->id, COLCURR))
         return emod_set(LIBTMAN_COL_MOVE);
     else if (unit_save(genpath_unit(args->prj, args->id), ctx->unitbin))
         return emod_set(LIBTMAN_UNIT_SET);
     return LIBTMAN_OK;
 }
 
-int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
@@ -173,7 +173,7 @@ int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
     return status;
 }
 
-int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
@@ -188,7 +188,7 @@ int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
     return LIBTMAN_OK;
 }
 
-int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
@@ -207,7 +207,7 @@ int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
  @param prj char * | NULL (then list the current project)
  @return struct item * | NULL (if error happened)
 */
-int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     DIR *ids;
     int status;
@@ -279,7 +279,7 @@ int tman_task_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
     return LIBTMAN_OK;
 }
 
-int tman_task_prev(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_task_prev(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
@@ -302,13 +302,13 @@ struct tman_unit *tman_unit_add(struct tman_unit *head, char *key, char *val)
     return unit_add(head, key, val);
 }
 
-void *tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+void *tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     unit_free(ctx->unitbin);
     return ctx->unitbin = NULL;
 }
 
-int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
     struct tman_unit *item;
@@ -329,13 +329,13 @@ int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
     return LIBTMAN_OK;
 }
 
-int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
     if ((status = check_args(args)))
         return status;
-    else if (options->id_switch == FALSE)
+    else if (opts->id_switch == FALSE)
         return LIBTMAN_OK;      /* here's nothing to do.  */
 
     if (project_addcurr(args->prj))
@@ -345,7 +345,7 @@ int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
     return LIBTMAN_OK;
 }
 
-int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
@@ -357,14 +357,14 @@ int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 
     if (dir_prj_add(tmanfs.base, args->prj))
         return emod_set(LIBTMAN_DIR_PRJ_MAKE);
-    else if (options->prj_switch == TRUE && project_addcurr(args->prj))
+    else if (opts->prj_switch == TRUE && project_addcurr(args->prj))
         return emod_set(LIBTMAN_PRJ_SWITCH);
     else if (unit_save(genpath_unit_prj(args->prj), ctx->unitbin))
         return emod_set(LIBTMAN_UNIT_SET);
     return LIBTMAN_OK;
 }
 
-int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
@@ -383,7 +383,7 @@ int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
 /*
  * roachme: Refactor this shit
 */
-int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * options)
+int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * opts)
 {
     DIR *edir;
     struct tman_unit *units;
@@ -433,7 +433,7 @@ int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * options)
     return LIBTMAN_OK;
 }
 
-int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * options)
+int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * opts)
 {
     int status;
     tman_arg_t args;
@@ -479,7 +479,7 @@ int tman_prj_rename(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
     return dir_prj_rename(tmanfs.base, src->prj, dst->prj);
 }
 
-int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
     struct tman_unit *item;
@@ -499,7 +499,7 @@ int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
     return LIBTMAN_OK;
 }
 
-int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
@@ -510,13 +510,13 @@ int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
     return LIBTMAN_OK;
 }
 
-int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
     if ((status = tman_check_arg_prj(args)))
         return status;
-    else if (options->prj_switch == FALSE)
+    else if (opts->prj_switch == FALSE)
         return LIBTMAN_OK;
 
     if (project_addcurr(args->prj))
@@ -524,22 +524,22 @@ int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
     return LIBTMAN_OK;
 }
 
-int tman_brd_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_brd_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     return 0;
 }
 
-int tman_brd_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_brd_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     return 0;
 }
 
-int tman_brd_list(tman_ctx_t * ctx, tman_opt_t * options)
+int tman_brd_list(tman_ctx_t * ctx, tman_opt_t * opts)
 {
     return 0;
 }
 
-int tman_brd_prev(tman_ctx_t * ctx, tman_opt_t * options)
+int tman_brd_prev(tman_ctx_t * ctx, tman_opt_t * opts)
 {
     return 0;
 }
@@ -549,17 +549,17 @@ int tman_brd_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
     return 0;
 }
 
-int tman_brd_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_brd_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     return 0;
 }
 
-int tman_brd_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_brd_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     return 0;
 }
 
-int tman_brd_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options)
+int tman_brd_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     return 0;
 }

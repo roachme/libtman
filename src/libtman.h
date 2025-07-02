@@ -60,7 +60,7 @@ const char *tman_strerror(void);
 
 /* Date structure.  */
 tman_unit_t *tman_unit_add(tman_unit_t * head, char *key, char *val);
-void *tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+void *tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 
 /* Input irguments functions.  */
 int tman_check_arg_id(tman_arg_t * args);
@@ -69,34 +69,34 @@ int tman_check_arg_brd(tman_arg_t * args);
 int tman_check_arg_prj(tman_arg_t * args);
 
 /* Task ID functions.  */
-int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst);
-int tman_task_prev(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_task_prev(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 
 /* Board functions.  */
-int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * options);
-int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * options);
+int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * opts);
+int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * opts);
 int tman_prj_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst);
-int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 
 /* Project functions.  */
-int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * options);
-int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * options);
+int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * opts);
+int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * opts);
 int tman_prj_rename(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst);
-int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
-int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * options);
+int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 
 #endif
