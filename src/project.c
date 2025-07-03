@@ -11,8 +11,11 @@
 
 #include "project.h"
 #include "common.h"
+#include "column.h"
 #include "errmod.h"
+#include "libtman.h"
 #include "osdep.h"
+#include "path.h"
 
 #define CPRJ        0           /* index of current prj */
 #define PPRJ        1           /* index of previous prj */
@@ -23,23 +26,13 @@
 static char *prjfile;
 static char prjs[NPRJ][PRJSIZ + 1];
 
+static char project_curr[IDSIZ + 1], project_prev[IDSIZ + 1];
+
 static int project_is_set(char *prj)
 {
     if (prj == NULL || prj[0] == '\0')
         return FALSE;
     return TRUE;
-}
-
-static int load(void)
-{
-    int i;
-    FILE *fp;
-
-    if ((fp = fopen(prjfile, "r")) == NULL)
-        return emod_set(LIBTMAN_PRJ_LOAD);
-
-    for (i = 0; i < NPRJ && fscanf(fp, PRJFMT, prjs[i]) == NPRJITEM; ++i) ;
-    return fclose(fp);
 }
 
 static int save(void)
@@ -53,14 +46,6 @@ static int save(void)
     for (i = 0; i < NPRJ && prjs[i][0] != '\0'; ++i)
         fprintf(fp, PRJFMT, prjs[i]);
     return fclose(fp);
-}
-
-int project_init(char *fstate)
-{
-    prjfile = fstate;
-
-    assert(fstate != NULL && "prj state file not passed or NULL");
-    return load();
 }
 
 // BUG: it does not return TRUE/FALSE, but number instead.
@@ -80,76 +65,72 @@ int project_exist(char *prj)
     return ISDIR(genpath_prj(prj));
 }
 
-char *project_getcurr()
+char *project_getcurr(char *base, const tman_arg_t * args)
 {
-    static char curr[PRJSIZ + 1];
-
-    if (project_is_set(prjs[CPRJ]) == FALSE)
-        return NULL;
-    return strncpy(curr, prjs[CPRJ], PRJSIZ);
+    return 0;
 }
 
-char *project_getprev()
+char *project_getprev(char *base, const tman_arg_t * args)
 {
-    static char prev[PRJSIZ + 1];
-
-    if (project_is_set(prjs[PPRJ]) == FALSE)
-        return NULL;
-    return strncpy(prev, prjs[PPRJ], PRJSIZ);
+    return 0;
 }
 
 int project_addcurr(char *prj)
 {
-    /* Prevent duplicates in toggles.  */
-    if (project_is_curr(prj) == TRUE)
-        return 0;
-    strncpy(prjs[PPRJ], prjs[CPRJ], PRJSIZ);
-    strncpy(prjs[CPRJ], prj, PRJSIZ);
-    return save();
+    return 0;
 }
 
 int project_delcurr(void)
 {
-    strncpy(prjs[CPRJ], prjs[PPRJ], PRJSIZ);
-    memset(prjs[PPRJ], 0, PRJSIZ);
-    return save();
+    return 0;
 }
 
 int project_delprev(void)
 {
-    memset(prjs[PPRJ], 0, PRJSIZ);
-    return save();
+    return 0;
 }
 
 int project_swap(void)
 {
-    char tmp[PRJSIZ + 1];
-
-    if (project_is_set(prjs[PPRJ]) == FALSE
-        || project_is_set(prjs[CPRJ]) == FALSE)
-        return 1;
-    strncpy(tmp, prjs[CPRJ], PRJSIZ);
-    strncpy(prjs[CPRJ], prjs[PPRJ], PRJSIZ);
-    strncpy(prjs[PPRJ], tmp, PRJSIZ);
-    return save();
+    return 0;
 }
 
 int project_is_curr(char *prj)
 {
-    if (prj == NULL)
-        return FALSE;
-    return strncmp(prj, prjs[CPRJ], PRJSIZ) == 0;
+    return 0;
 }
 
 int project_is_prev(char *prj)
 {
-    if (prj == NULL)
-        return FALSE;
-    return strncmp(prj, prjs[PPRJ], PRJSIZ) == 0;
+    return 0;
 }
 
 /* TODO: change function name, cuz it's confusing.  */
 int project_is_valid_length(char *prj)
 {
     return strlen(prj) <= PRJSIZ;
+}
+
+// roach
+
+// TODO: maybe it's better to add new objects to column BLOG by default?
+int project_add(char *base, const tman_arg_t * args, char *colname)
+{
+    return 0;
+}
+
+static int swap(const tman_arg_t * a, const tman_arg_t * b, toggle_t * toggle)
+{
+    return 0;
+}
+
+static int movecurr(char *base, const tman_arg_t * args, toggle_t * toggle,
+                    char *colname)
+{
+    return 0;
+}
+
+int project_move(char *base, const tman_arg_t * args, char *colname)
+{
+    return 0;
 }

@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <dirent.h>
 
-#include "col.h"
 #include "dir.h"
+#include "board.h"
+#include "column.h"
 #include "project.h"
 #include "unit.h"
 #include "libtman.h"
@@ -13,6 +14,7 @@
 #include "common.h"
 #include "osdep.h"
 #include "errmod.h"
+#include "path.h"
 
 // TODO: Make NOT global.
 struct tmanstruct tmanfs;
@@ -45,42 +47,53 @@ static int fill_sysvars(tman_base_t * base)
 {
     sprintf(tmanfs.base, "%s", base->task);
     sprintf(tmanfs.db, "%s/%s", base->task, ".tman");
-    sprintf(tmanfs.finit, "%s/%s", tmanfs.db, "inited");
-    sprintf(tmanfs.fstate, "%s/%s", tmanfs.db, "state");        // should be called prj
-    sprintf(tmanfs.pgn, "%s/%s", base->task, ".pgn");   //should be called `pgndb`
-    sprintf(tmanfs.pgnins, "%s", base->pgn);
+    sprintf(tmanfs.pgn, "%s", base->pgn);
     return LIBTMAN_OK;
 }
 
 int tman_check_arg_id_exist(tman_arg_t * args)
 {
-    if (task_exist(args->prj, args->id) == FALSE)
+    if (task_exist(tmanfs.base, args) == FALSE)
         return FALSE;
     return TRUE;
 }
 
 int tman_check_arg_id(tman_arg_t * args)
 {
-    if (args->id == NULL && (args->id = task_curr(args->prj)) == NULL)
+    if (args->id == NULL
+        && (args->id = task_getcurr(tmanfs.base, args)) == NULL) {
+        fprintf(stderr, "tman_check_arg_id  ------ 1\n");
         return emod_set(LIBTMAN_ID_NOCURR);
-    else if (task_is_valid_name(args->id) == FALSE)
+    } else if (task_is_valid_name(args->id) == FALSE)
         return emod_set(LIBTMAN_ID_ILLEG);
     else if (task_is_valid_length(args->id) == FALSE)
         return emod_set(LIBTMAN_ID_TOOLONG);
-    else if (task_exist(args->prj, args->id) == FALSE)
+    else if (task_exist(tmanfs.base, args) == FALSE)
         return emod_set(LIBTMAN_ID_NOSUCH);
     return LIBTMAN_OK;
 }
 
 int tman_check_arg_brd(tman_arg_t * args)
 {
-    /* TODO: add board name checks.  */
+    if (args->brd == NULL && (args->brd = column_board_curr(args)) == NULL)
+        return emod_set(LIBTMAN_BRD_NOCURR);
+    /*
+       else if (board_is_valid_name(args->id) == FALSE)
+       return emod_set(LIBTMAN_ID_ILLEG);
+       else if (board_is_valid_length(args->id) == FALSE)
+       return emod_set(LIBTMAN_ID_TOOLONG);
+     */
+
+    fprintf(stderr, "--------------- %s: %s\n", __FUNCTION__, args->brd);
+    if (board_exist(tmanfs.base, args) == FALSE)
+        return emod_set(LIBTMAN_BRD_NOSUCH);
+    fprintf(stderr, "--------------- %s\n", __FUNCTION__);
     return LIBTMAN_OK;
 }
 
 int tman_check_arg_prj(tman_arg_t * args)
 {
-    if (args->prj == NULL && (args->prj = project_getcurr()) == NULL)
+    if (args->prj == NULL && (args->prj = column_project_curr(args)) == NULL)
         return emod_set(LIBTMAN_PRJ_NOCURR);
     else if (project_is_valid_name(args->prj) == FALSE)
         return emod_set(LIBTMAN_PRJ_ILLEG);
@@ -95,17 +108,9 @@ int tman_mkfs(void)
 {
     if (MKDIR(tmanfs.base))
         return emod_set(LIBTMAN_SYS_FS);
-    else if (MKDIR(tmanfs.base))
-        return emod_set(LIBTMAN_SYS_FS);
-    else if (MKDIR(tmanfs.pgn))
-        return emod_set(LIBTMAN_SYS_FS);
-    else if (MKDIR(tmanfs.pgnins))
-        return emod_set(LIBTMAN_SYS_FS);
     else if (MKDIR(tmanfs.db))
         return emod_set(LIBTMAN_SYS_FS);
-    else if (TOUCH(tmanfs.fstate))
-        return emod_set(LIBTMAN_SYS_FS);
-    else if (TOUCH(tmanfs.finit))
+    else if (MKDIR(tmanfs.pgn))
         return emod_set(LIBTMAN_SYS_FS);
     return LIBTMAN_OK;
 }
@@ -121,18 +126,13 @@ tman_ctx_t *tman_init(tman_base_t * base)
 
 int tman_setup(int setuplvl)
 {
-    int status;
+    int status = LIBTMAN_OK;
 
     if (setuplvl == LIBTMAN_SETUPSOFT)  /* no filesystem check.  */
-        status = LIBTMAN_OK;
+        ;
     else if (setuplvl == LIBTMAN_SETUPCHECK) {  /* check filesystem.  */
-        status = LIBTMAN_OK;
-        // NOTE: delete finit, use .tman db dir
-        if (ISFILE(tmanfs.finit) != TRUE) {
+        if (ISDIR(tmanfs.db) != TRUE)
             status = emod_set(LIBTMAN_EINIT);
-        } else if (project_init(tmanfs.fstate) != 0)
-            status = emod_set(LIBTMAN_EINIT_PRJMOD);
-        // NOTE: is it a good idea to init module project in general and here?
     } else {                    /* LIBTMAN_SETUPHARD: create filesystem.  */
         if ((status = tman_mkfs()) != LIBTMAN_OK)
             status = emod_set(LIBTMAN_EFINIT);
@@ -147,16 +147,16 @@ int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     /* Special case: task ID should not exists. If this's a case - let it go. */
     if ((status = check_args(args)) && status != LIBTMAN_ID_NOSUCH)
         return status;
-    else if (task_exist(args->prj, args->id) == TRUE)
+    else if (task_exist(tmanfs.base, args) == TRUE)
         return emod_set(LIBTMAN_ID_EXISTS);
 
-    if (dir_id_add(tmanfs.base, args->prj, args->id) != 0)
+    if (dir_id_add(tmanfs.base, args) != 0)
         return emod_set(LIBTMAN_DIR_ID_MAKE);
-    else if (task_add(args->prj, args->id))
+    else if (task_add(tmanfs.base, args, COLBLOG))
         return emod_set(LIBTMAN_COL_ADD);
-    else if (opts->id_switch && task_move(args->prj, args->id, COLCURR))
+    else if (opts->id_switch && task_move(tmanfs.base, args, COLCURR))
         return emod_set(LIBTMAN_COL_MOVE);
-    else if (unit_save(genpath_unit(args->prj, args->id), ctx->unitbin))
+    else if (unit_save(path_task_unit(tmanfs.base, args), ctx->unitbin))
         return emod_set(LIBTMAN_UNIT_SET);
     return LIBTMAN_OK;
 }
@@ -168,12 +168,12 @@ int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     if ((status = check_args(args)))
         return status;
 
-    if ((ctx->unitbin = unit_load(genpath_unit(args->prj, args->id))) == NULL)
+    if ((ctx->unitbin = unit_load(path_task_unit(tmanfs.base, args))) == NULL)
         status = LIBTMAN_UNIT_GET;
     return status;
 }
 
-int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
+int tman_task_flow(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
@@ -181,9 +181,7 @@ int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 
     if ((status = check_args(args)))
         return status;
-    else if (col_ext(ctx->colname) == FALSE)
-        return emod_set(LIBTMAN_COL_EXISTS);
-    else if (task_move(args->prj, args->id, ctx->colname))
+    else if (task_move(tmanfs.base, args, ctx->colname))
         return emod_set(LIBTMAN_COL_MOVE);
     return LIBTMAN_OK;
 }
@@ -195,13 +193,15 @@ int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     if ((status = check_args(args)))
         return status;
 
-    if (task_del(args->prj, args->id))
+    if (task_del(tmanfs.base, args))
         return emod_set(LIBTMAN_COL_DEL);
     else if (dir_id_del(tmanfs.base, args->prj, args->id))
         return emod_set(LIBTMAN_DIR_ID_DEL);
     return LIBTMAN_OK;
 }
 
+// TODO: for task IDs that are invalid, use separate memeber in ctx.
+// if invalid then ctx->invIDS = add_id(id);
 /*
  * roachme: refactor this shit.
  @param prj char * | NULL (then list the current project)
@@ -214,6 +214,7 @@ int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     struct dirent *ent;
     struct tree *node;
     struct tman_unit *units;
+    tman_arg_t tmp;
 
     // TODO: move to to cli part
     /* Free task ID list because it might be called more than once.  */
@@ -221,29 +222,35 @@ int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     node = NULL;
     units = NULL;
 
-    if ((status = tman_check_arg_prj(args)) != LIBTMAN_OK)
+    tmp.id = args->id;
+    tmp.brd = args->brd;
+    tmp.prj = args->prj;
+
+    if ((status = tman_check_arg_prj(&tmp)) != LIBTMAN_OK)
         return status;
-    else if ((ids = opendir(genpath_prj(args->prj))) == NULL)
+    else if ((status = tman_check_arg_brd(&tmp)) != LIBTMAN_OK)
+        return status;
+    else if ((ids = opendir(path_brd_dir(tmanfs.base, &tmp))) == NULL)
         return emod_set(LIBTMAN_DIR_PRJ_OPEN);
 
     while ((ent = readdir(ids)) != NULL) {
-        args->id = ent->d_name;
+        tmp.id = ent->d_name;
 
         if (ent->d_name[0] == '.' || ent->d_type != DT_DIR)
             continue;
-        else if (tman_check_arg_id(args)) {
+        else if (tman_check_arg_id(&tmp)) {
             // TODO: roach: sholud we leave it here? If not then what?..
+            fprintf(stderr, "tman_task_list: failed: %s\n", tmp.id);
             continue;
-        } else if ((units = unit_load(genpath_unit(args->prj, args->id))) ==
+        } else if ((units = unit_load(path_task_unit(tmanfs.base, &tmp))) ==
                    NULL) {
             // TODO: roach: sholud we leave it here? If not then what?..
             // IF builtin units could not get
+            fprintf(stderr, "tman_task_list: unit_load: failed\n");
             continue;
         }
-        struct column column = col_getmark(args->prj, ent->d_name);
-        node =
-            tree_alloc(ent->d_name, col_prio(column.col),
-                       unit_get(units, "desc"), "");
+        //struct column column = col_getmark(tmp.prj, ent->d_name);
+        node = tree_alloc(ent->d_name, 2, unit_get(units, "desc"), "");
         ctx->ids = tree_add(ctx->ids, node);
         unit_free(units);
     }
@@ -259,7 +266,7 @@ int tman_task_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
         return emod_set(status);
     else if ((status = check_args(dst)) && status != LIBTMAN_ID_NOSUCH)
         return emod_set(status);
-    else if (task_exist(dst->prj, dst->id))
+    else if (task_exist(tmanfs.base, dst))
         return emod_set(LIBTMAN_ID_EXISTS);
 
     /*
@@ -268,10 +275,10 @@ int tman_task_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
      * multiple current or previous tasks later.
      */
     if (strcmp(src->prj, dst->prj) != 0) {
-        if (task_iscurr(src->prj, src->id))
-            task_del(src->prj, src->id);
-        else if (task_isprev(src->prj, src->id))
-            task_del(src->prj, src->id);
+        if (task_iscurr(tmanfs.base, src))
+            task_del(tmanfs.base, src);
+        else if (task_isprev(tmanfs.base, src))
+            task_del(tmanfs.base, src);
     }
 
     if (dir_id_rename(tmanfs.base, src->prj, dst->prj, src->id, dst->id))
@@ -279,21 +286,25 @@ int tman_task_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
     return LIBTMAN_OK;
 }
 
+// TODO: add support to switch to previous task in any project
 int tman_task_prev(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
+    return 0;
 
     if ((status = check_args(args)))
         return status;
-    else if (task_prev(args->prj) == NULL)
+    else if (task_getprev(tmanfs.base, args) == NULL)
         return emod_set(LIBTMAN_ID_NOPREV);
 
-    if (task_swap(args->prj))
-        return emod_set(LIBTMAN_ID_SWAP);
+    /*
+       if (task_swap(tmanfs.base, args))
+       return emod_set(LIBTMAN_ID_SWAP);
+     */
 
     /* Get new current task ID explicitly. check_args() won't work, cuz
      * there's args->id == old current task ID.  */
-    args->id = task_curr(args->prj);
+    args->id = task_getcurr(tmanfs.base, args);
     return check_args(args);
 }
 
@@ -340,7 +351,7 @@ int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 
     if (project_addcurr(args->prj))
         return emod_set(LIBTMAN_PRJ_SWITCH);
-    else if (task_move(args->prj, args->id, COLCURR))
+    else if (task_move(tmanfs.base, args, COLCURR))
         return emod_set(LIBTMAN_ID_SWAP);
     return LIBTMAN_OK;
 }
@@ -357,9 +368,11 @@ int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 
     if (dir_prj_add(tmanfs.base, args->prj))
         return emod_set(LIBTMAN_DIR_PRJ_MAKE);
-    else if (opts->prj_switch == TRUE && project_addcurr(args->prj))
+    else if (opts->prj_switch && column_project_move(args, COLCURR))
         return emod_set(LIBTMAN_PRJ_SWITCH);
-    else if (unit_save(genpath_unit_prj(args->prj), ctx->unitbin))
+    else if (!opts->prj_switch && column_project_add(args, COLBLOG))
+        return emod_set(LIBTMAN_COL_ADD);
+    else if (unit_save(path_prj_unit(tmanfs.base, args), ctx->unitbin))
         return emod_set(LIBTMAN_UNIT_SET);
     return LIBTMAN_OK;
 }
@@ -371,12 +384,10 @@ int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     if ((status = tman_check_arg_prj(args)))
         return status;
 
-    if (dir_prj_del(tmanfs.base, args->prj))
-        return emod_set(LIBTMAN_DIR_PRJ_DEL);
-    else if (project_is_curr(args->prj) == TRUE && project_delcurr())
-        return emod_set(LIBTMAN_PRJ_DEL_CURR);
-    else if (project_is_prev(args->prj) == TRUE && project_delprev())
+    if (column_project_del(args))
         return emod_set(LIBTMAN_PRJ_DEL_PREV);
+    else if (dir_prj_del(tmanfs.base, args->prj))
+        return emod_set(LIBTMAN_DIR_PRJ_DEL);
     return LIBTMAN_OK;
 }
 
@@ -401,8 +412,8 @@ int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * opts)
     tree_free(ctx->prjs);
     ctx->prjs = NULL;
 
-    cprj = project_getcurr();
-    pprj = project_getprev();
+    cprj = project_getcurr(tmanfs.base, &args);
+    pprj = project_getprev(tmanfs.base, &args);
     while ((ent = readdir(edir)) != NULL) {
         args.prj = ent->d_name;
 
@@ -411,7 +422,9 @@ int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * opts)
         else if (tman_check_arg_prj(&args)) {
             // TODO: roach: sholud we leave it here? If not then what?..
             continue;
-        } else if ((units = unit_load(genpath_unit_prj(args.prj))) == NULL) {
+        } else if ((units = unit_load(path_prj_unit(tmanfs.base, &args))) ==
+                   NULL) {
+            fprintf(stderr, "tman_prj_list:unit: error\n");
             // TODO: roach: sholud we leave it here? If not then what?..
             // IF builtin units could not get
             continue;
@@ -439,11 +452,13 @@ int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * opts)
     tman_arg_t args;
 
     args.brd = args.id = NULL;
-    if ((args.prj = project_getcurr()) && (status = tman_check_arg_prj(&args)))
+    if ((args.prj = column_project_curr(&args))
+        && (status = tman_check_arg_prj(&args)))
         return status;
-    if ((args.prj = project_getprev()) && (status = tman_check_arg_prj(&args)))
+    if ((args.prj = column_project_prev(&args))
+        && (status = tman_check_arg_prj(&args)))
         return status;
-    if (project_swap())
+    if (column_project_swap(&args))
         return emod_set(LIBTMAN_PRJ_SWAP);
     return LIBTMAN_OK;
 }
@@ -451,6 +466,9 @@ int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * opts)
 int tman_prj_rename(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
 {
     int status;
+    // roach
+    fprintf(stderr, "tman_prj_rename: ADD function column_project_is_curr()\n");
+    return 0;
 
     /* TODO: Use tman_check_arg_prj() to remove code duplication.  */
     if (src->prj == NULL)
@@ -487,14 +505,14 @@ int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 
     if ((status = tman_check_arg_prj(args)))
         return status;
-    else if ((units = unit_load(genpath_unit_prj(args->prj))) == NULL)
+    else if ((units = unit_load(path_prj_unit(tmanfs.base, args))) == NULL)
         return emod_set(LIBTMAN_NODEF_ERR);
 
-    for (item = ctx->unitbin; item; item = item->next) {
+    for (item = ctx->unitbin; item; item = item->next)
         unit_set(units, item->key, item->val);
-    }
-    if (unit_save(genpath_unit_prj(args->prj), units))
+    if (unit_save(path_prj_unit(tmanfs.base, args), units))
         return emod_set(LIBTMAN_UNIT_SET);
+    // TODO: is it good idea to free it here, or in CLI part?
     unit_free(units);
     return LIBTMAN_OK;
 }
@@ -505,7 +523,8 @@ int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 
     if ((status = tman_check_arg_prj(args)))
         return status;
-    else if ((ctx->unitbin = unit_load(genpath_unit_prj(args->prj))) == NULL)
+    else if ((ctx->unitbin =
+              unit_load(path_prj_unit(tmanfs.base, args))) == NULL)
         return emod_set(LIBTMAN_NODEF_ERR);
     return LIBTMAN_OK;
 }
@@ -519,14 +538,32 @@ int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     else if (opts->prj_switch == FALSE)
         return LIBTMAN_OK;
 
-    if (project_addcurr(args->prj))
+    if (column_project_add(args, COLCURR))
         return emod_set(LIBTMAN_PRJ_SWITCH);
     return LIBTMAN_OK;
 }
 
 int tman_brd_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
-    return 0;
+    int status;
+
+    /* Special case: board should not exists. If this's a case - let it go. */
+    if ((status = tman_check_arg_prj(args)))
+        return status;
+    if ((status = tman_check_arg_brd(args)) && status != LIBTMAN_BRD_NOSUCH)
+        return status;
+    if (board_exist(tmanfs.base, args) == TRUE)
+        return emod_set(LIBTMAN_BRD_EXISTS);
+
+    if (dir_brd_add(tmanfs.base, args->prj, args->brd))
+        return emod_set(LIBTMAN_NODEF_ERR);
+    else if (opts->brd_switch && column_board_move(args, COLCURR))
+        return emod_set(LIBTMAN_NODEF_ERR);
+    else if (!opts->brd_switch && column_board_move(args, COLBLOG))
+        return emod_set(LIBTMAN_NODEF_ERR);
+    else if (unit_save(path_brd_unit(tmanfs.base, args), ctx->unitbrd))
+        return emod_set(LIBTMAN_NODEF_ERR);
+    return LIBTMAN_OK;
 }
 
 int tman_brd_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)

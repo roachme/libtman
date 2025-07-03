@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "tree.h"
-#include "col.h"
+#include "column.h"
 #include "common.h"
 
 struct tree *tree_alloc(char *id, int colprio, char *desc, char *pgnout)
@@ -15,7 +15,7 @@ struct tree *tree_alloc(char *id, int colprio, char *desc, char *pgnout)
     // NOTE: somehow sets off uninited values
     memset(node, 0, sizeof(struct tree));
 
-    node->mark = col_get2(colprio);
+    node->mark = 'x';
     node->colprio = colprio;
     strncpy(node->id, id, IDSIZ);
     strncpy(node->desc, desc, DESCSIZ);

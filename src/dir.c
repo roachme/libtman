@@ -2,10 +2,18 @@
 #include "common.h"
 #include "osdep.h"
 
-static int _id_dbmkdir(char *base, char *prj, char *id)
+static int _id_dbmkdir(char *base, tman_arg_t * args)
 {
     char path[PATHSIZ + 1];
-    sprintf(path, "%s/%s/%s/.tman", base, prj, id);
+    const char *fmt = "%s/%s/%s/%s/.tman";
+    sprintf(path, fmt, base, args->prj, args->brd, args->id);
+    return MKDIR(path);
+}
+
+static int _brd_dbmkdir(char *base, char *prj, char *brd)
+{
+    char path[PATHSIZ + 1];
+    sprintf(path, "%s/%s/%s/.tman", base, prj, brd);
     return MKDIR(path);
 }
 
@@ -16,11 +24,12 @@ static int _prj_dbmkdir(char *base, char *prj)
     return MKDIR(path);
 }
 
-int dir_id_add(char *base, char *prj, char *id)
+int dir_id_add(char *base, tman_arg_t * args)
 {
     char path[PATHSIZ + 1];
-    sprintf(path, "%s/%s/%s", base, prj, id);
-    return !(MKDIR(path) == 0 && _id_dbmkdir(base, prj, id) == 0);
+    const char *fmt = "%s/%s/%s/%s";
+    sprintf(path, fmt, base, args->prj, args->brd, args->id);
+    return !(MKDIR(path) == 0 && _id_dbmkdir(base, args) == 0);
 }
 
 int dir_id_del(char *base, char *prj, char *id)
@@ -38,6 +47,13 @@ int dir_id_rename(char *base, char *srcprj, char *dstprj, char *srcid,
     sprintf(old_path, "%s/%s/%s", base, srcprj, srcid);
     sprintf(new_path, "%s/%s/%s", base, dstprj, dstid);
     return rename(old_path, new_path);
+}
+
+int dir_brd_add(char *base, char *prj, char *brd)
+{
+    char path[PATHSIZ + 1];
+    sprintf(path, "%s/%s/%s", base, prj, brd);
+    return !(MKDIR(path) == 0 && _brd_dbmkdir(base, prj, brd) == 0);
 }
 
 int dir_prj_add(char *base, char *prj)

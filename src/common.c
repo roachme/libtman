@@ -1,7 +1,6 @@
 #include <stdarg.h>
 #include <ctype.h>
 
-#include "libtman.h"
 #include "common.h"
 
 static char *base = tmanfs.base;

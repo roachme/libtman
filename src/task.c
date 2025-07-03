@@ -2,186 +2,30 @@
     It also supports toggles, i.e. current and previous task IDs.  */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
 #include <ctype.h>
+
 #include "task.h"
-#include "col.h"
+#include "column.h"
+#include "common.h"
 #include "common.h"
 #include "osdep.h"
+#include "libtman.h"
+#include "path.h"
 
-static char curr[IDSIZ + 1], prev[IDSIZ + 1];
+/*
+Default columns:
+    curr
+    prev
+    blog
+
+User defined columns (go to cli part):
+    TBD
+*/
 
 /* For external use. Used only by getters so no harm to module.  */
 static char taskcurr[IDSIZ + 1], taskprev[IDSIZ + 1];
-
-/*
- * Notes:
- * 1. col_del() should delete a file or what? Move it to column blog or done??
-*/
-
-static int addcurr(char *prj, char *id)
-{
-    /* Prevent duplicate toggles.  */
-    if (strncmp(id, curr, IDSIZ) == 0) {
-        return 0;
-    }
-
-    if (prev[0] != '\0')
-        col_set(prj, prev, COLBLOG);
-
-    if (curr[0] != '\0') {
-        col_set(prj, curr, COLPREV);
-        strncpy(prev, curr, IDSIZ);
-        prev[IDSIZ] = '\0';
-    }
-    col_set(prj, id, COLCURR);
-    strncpy(curr, id, IDSIZ);
-    curr[IDSIZ] = '\0';
-    return 0;
-}
-
-static int delcurr(char *prj, char *colname)
-{
-    col_set(prj, curr, colname);
-    memset(curr, 0, IDSIZ);
-    if (prev[0] != '\0') {
-        col_set(prj, prev, COLCURR);
-        strncpy(curr, prev, IDSIZ);
-        curr[IDSIZ] = '\0';
-    }
-    return 0;
-}
-
-static int delprev(char *prj)
-{
-    if (curr[0] == '\0') {
-        return 1;
-    }
-
-    col_set(prj, prev, COLBLOG);
-    prev[0] = '\0';
-    return 0;
-}
-
-static int addprev(char *prj, char *id)
-{
-    /* Return an error if current task is not set yet.  */
-    if (curr[0] == '\0')
-        return 1;
-    col_set(prj, id, COLPREV);
-    strncpy(prev, id, IDSIZ);
-    prev[IDSIZ] = '\0';
-    return 0;
-}
-
-static int swap(char *prj)
-{
-    char tmp[IDSIZ + 1];
-
-    if (curr[0] == '\0' || prev[0] == '\0') {
-        return 1;
-    }
-    strncpy(tmp, prev, IDSIZ);
-    tmp[IDSIZ] = '\0';
-    return addcurr(prj, tmp);
-}
-
-/* Move current task to another column.  */
-static int movecurr(char *prj, char *id, char *col)
-{
-    if (strncmp(col, COLCURR, COLSIZ) == 0)
-        return 0;               /* do nothing */
-    if (strncmp(col, COLPREV, COLSIZ) == 0) {
-        /* If previous task ID not set then it's an error
-         * cuz you can't do swapping.  */
-        return swap(prj);
-    }
-    return delcurr(prj, col);
-}
-
-/* Move previous task to another column.  */
-static int moveprev(char *prj, char *id, char *col)
-{
-    if (strncmp(col, COLPREV, COLSIZ) == 0)
-        return 0;               /* do nothing */
-    if (strncmp(col, COLCURR, COLSIZ) == 0)
-        return swap(prj);
-    return delprev(prj);
-}
-
-/* Move random task to another column. */
-static int movetask(char *prj, char *id, char *col)
-{
-    if (strncmp(col, COLCURR, COLSIZ) == 0) {
-        return addcurr(prj, id);
-    } else if (strncmp(col, COLPREV, COLSIZ) == 0) {
-        return addprev(prj, id);
-    }
-    return col_set(prj, id, col);
-}
-
-static int reset()
-{
-    memset(curr, 0, IDSIZ);
-    memset(prev, 0, IDSIZ);
-    return 0;
-}
-
-static int load(char *prj)
-{
-    DIR *dir;
-    char *col;
-    struct dirent *ent;
-
-    if ((dir = opendir(genpath_prj(prj))) == NULL)
-        return 1;
-
-    reset();
-    while ((ent = readdir(dir)) != NULL) {
-        if (ent->d_name[0] == '.' || ent->d_type != DT_DIR)
-            continue;
-        else if ((col = col_get(prj, ent->d_name)) == NULL) {
-            fprintf(stderr, "warn: could not get col file: %s:%s\n",
-                    prj, ent->d_name);
-            continue;
-        }
-        if (strncmp(col, COLCURR, IDSIZ) == 0) {
-            strncpy(curr, ent->d_name, IDSIZ);
-            curr[IDSIZ] = '\0';
-        } else if (strncmp(col, COLPREV, IDSIZ) == 0) {
-            strncpy(prev, ent->d_name, IDSIZ);
-            prev[IDSIZ] = '\0';
-        } else if (curr[0] != '\0' && prev[0] != '\0')
-            break;
-    }
-    return closedir(dir);
-}
-
-/*
- * Get current task ID in project.
- * @param prj project name
- * @return current task ID
-*/
-char *task_curr(char *prj)
-{
-    if (load(prj) || curr[0] == '\0')
-        return NULL;
-    return strncpy(taskcurr, curr, IDSIZ);
-}
-
-/*
- * Get previous task ID in project.
- * @param prj project name
- * @return previous task ID
-*/
-char *task_prev(char *prj)
-{
-    if (load(prj) || prev[0] == '\0')
-        return NULL;
-    return strncpy(taskprev, prev, IDSIZ);
-}
 
 /*
  * Check that task ID is valid.
@@ -211,19 +55,93 @@ int task_is_valid_length(char *id)
  * @param prj project name
  * @param id task ID
 */
-int task_exist(char *prj, char *id)
+int task_exist(char *base, const tman_arg_t * args)
 {
-    return ISDIR(genpath_full(prj, id));
+    return ISDIR(path_task_dir(base, args));
+}
+
+/*
+ * Notes:
+ * 1. col_del() should delete a file or what? Move it to column blog or done??
+*/
+
+static int addcurr(char *base, const tman_arg_t * args, toggle_t * toggle)
+{
+    return 0;
+}
+
+static int delcurr(char *base, const tman_arg_t * args, toggle_t * toggle,
+                   char *colname)
+{
+    return 0;
+}
+
+static int delprev(char *base, const tman_arg_t * args, toggle_t * toggle,
+                   char *colname)
+{
+    return 0;
+}
+
+static int addprev(char *base, const tman_arg_t * args, toggle_t * toggle)
+{
+    return 0;
+}
+
+static int swap(const tman_arg_t * a, const tman_arg_t * b, toggle_t * toggle)
+{
+    return 0;
+}
+
+/* Move current task to another column.  */
+static int movecurr(char *base, const tman_arg_t * args, toggle_t * toggle,
+                    char *colname)
+{
+    return 0;
+}
+
+/* Move previous task to another column.  */
+static int moveprev(char *base, const tman_arg_t * args, toggle_t * toggle,
+                    char *colname)
+{
+    return 0;
+}
+
+/* Move random task to another column. */
+static int movetask(char *base, const tman_arg_t * args, toggle_t * toggle,
+                    char *colname)
+{
+    return 0;
+}
+
+/*
+ * Get current task ID in project.
+ * @param prj project name
+ * @return current task ID
+*/
+char *task_getcurr(char *base, const tman_arg_t * args)
+{
+    return 0;
+}
+
+/*
+ * Get previous task ID in project.
+ * @param prj project name
+ * @return previous task ID
+*/
+char *task_getprev(char *base, const tman_arg_t * args)
+{
+    return 0;
 }
 
 /*
  * Add a task to column.
- * @param prj project name
- * @param id task ID
+ * @param base task directory
+ * @param args input arguments
+ * @param colname column name
 */
-int task_add(char *prj, char *id)
+int task_add(char *base, const tman_arg_t * args, char *colname)
 {
-    return col_set(prj, id, COLBLOG);
+    return 0;
 }
 
 /**
@@ -233,38 +151,19 @@ int task_add(char *prj, char *id)
  * @return on success: 0
  * @return on failure: 1
 */
-int task_del(char *prj, char *id)
+int task_del(char *base, const tman_arg_t * args)
 {
-    if (load(prj))
-        return 1;
-
-    if (strncmp(id, curr, IDSIZ) == 0)
-        return delcurr(prj, COLBLOG);
-    else if (strncmp(id, prev, IDSIZ) == 0)
-        return delprev(prj);
-    return col_del(prj, id);
+    return 0;
 }
 
-int task_iscurr(char *prj, char *id)
+int task_iscurr(char *base, const tman_arg_t * args)
 {
-    char *currid = task_curr(prj);
-
-    if (currid == NULL)
-        return FALSE;
-    else if (strncmp(currid, id, IDSIZ) == 0)
-        return TRUE;
-    return FALSE;
+    return 0;
 }
 
-int task_isprev(char *prj, char *id)
+int task_isprev(char *base, const tman_arg_t * args)
 {
-    char *previd = task_prev(prj);
-
-    if (previd == NULL)
-        return FALSE;
-    else if (strncmp(previd, id, IDSIZ) == 0)
-        return TRUE;
-    return FALSE;
+    return 0;
 }
 
 /*
@@ -273,24 +172,16 @@ int task_isprev(char *prj, char *id)
  * @param id task ID
  * @param col column name
 */
-int task_move(char *prj, char *id, char *col)
+int task_move(char *base, const tman_arg_t * args, char *colname)
 {
-    if (load(prj))
-        return 1;
-
-    if (strncmp(curr, id, IDSIZ) == 0) {
-        return movecurr(prj, curr, col);
-    } else if (strncmp(prev, id, IDSIZ) == 0) {
-        return moveprev(prj, prev, col);
-    }
-    return movetask(prj, id, col);
+    return 0;
 }
 
 /**
  * Swap current and previous task IDs in project.
  * @param prj project
 */
-int task_swap(char *prj)
+int task_swap(char *base, const tman_arg_t * a, const tman_arg_t * b)
 {
-    return swap(prj);
+    return 0;
 }

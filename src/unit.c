@@ -8,8 +8,10 @@ int unit_save(char *filename, struct tman_unit *units)
 {
     FILE *fp;
 
-    if ((fp = fopen(filename, "w")) == NULL)
+    if ((fp = fopen(filename, "w")) == NULL) {
+        fprintf(stderr, "unit_save: failed to open file: '%s'\n", filename);
         return 1;
+    }
 
     for (; units; units = units->next)
         fprintf(fp, "%s : %s\n", units->key, units->val);
