@@ -31,7 +31,19 @@ enum tman_err_enum {
     LIBTMAN_PRJ_DEL_PREV,
     LIBTMAN_PRJ_MISSING,
 
+    LIBTMAN_BRD_LOAD,
+    LIBTMAN_BRD_SAVE,
+    LIBTMAN_BRD_SWAP,
+    LIBTMAN_BRD_TOOLONG,
+    LIBTMAN_BRD_ILLEG,
     LIBTMAN_BRD_NOCURR,
+    LIBTMAN_BRD_NOPREV,
+    LIBTMAN_BRD_NOSUCH,
+    LIBTMAN_BRD_EXISTS,
+    LIBTMAN_BRD_SWITCH,
+    LIBTMAN_BRD_DEL_CURR,
+    LIBTMAN_BRD_DEL_PREV,
+    LIBTMAN_BRD_MISSING,
 
     LIBTMAN_ID_ILLEG,
     LIBTMAN_ID_TOOLONG,
@@ -42,6 +54,7 @@ enum tman_err_enum {
     LIBTMAN_ID_SWAP,
 
     LIBTMAN_COL_ADD,
+    LIBTMAN_COL_GET,
     LIBTMAN_COL_MOVE,
     LIBTMAN_COL_DEL,
     LIBTMAN_COL_EXISTS,
@@ -49,17 +62,19 @@ enum tman_err_enum {
     LIBTMAN_DIR_ID_MAKE,
     LIBTMAN_DIR_ID_DEL,
     LIBTMAN_DIR_ID_REN,
-    LIBTMAN_UNIT_MAKE,
-    LIBTMAN_UNIT_DEL,
     LIBTMAN_DIR_ID_OPEN,
 
     LIBTMAN_DIR_PRJ_DEL,
     LIBTMAN_DIR_PRJ_MAKE,
     LIBTMAN_DIR_PRJ_OPEN,
 
-    LIBTMAN_UNIT_SET,
+    LIBTMAN_UNIT_DEL,
     LIBTMAN_UNIT_GET,
     LIBTMAN_UNIT_ILLEG,
+    LIBTMAN_UNIT_KEY,
+    LIBTMAN_UNIT_LOAD,
+    LIBTMAN_UNIT_MAKE,
+    LIBTMAN_UNIT_SET,
 
     LIBTMAN_CMD_BIN,
     LIBTMAN_CMD_PGN,
@@ -78,5 +93,6 @@ struct tman_err_codes {
 int emod_get(void);
 int emod_set(int err);
 const char *emod_strerror(void);
+const char *emod_strerror_get(int status);
 
 #endif

@@ -2,10 +2,10 @@
 #define LIBTMAN_TREE_H
 
 #include "common.h"
-#include "task.h"
 
 struct tree {
     int mark;
+    int status;                 /* error code in case of invalid value */
     int colprio;
     char id[IDSIZ + 1];
     char desc[DESCSIZ + 1];

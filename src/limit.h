@@ -2,8 +2,8 @@
     Define util limitations in one place.
 */
 
-#ifndef LIMIT_H
-#define LIMIT_H
+#ifndef LIBTMAN_LIMIT_H
+#define LIBTMAN_LIMIT_H
 
 /* roachme: delete these constrains */
 

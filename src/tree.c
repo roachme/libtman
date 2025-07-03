@@ -1,8 +1,9 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "tree.h"
-#include "col.h"
+#include "column.h"
 #include "common.h"
 
 struct tree *tree_alloc(char *id, int colprio, char *desc, char *pgnout)
@@ -12,10 +13,17 @@ struct tree *tree_alloc(char *id, int colprio, char *desc, char *pgnout)
     if ((node = malloc(sizeof(struct tree))) == NULL)
         return NULL;
 
-    // NOTE: somehow sets off uninited values
+    // NOTE: the fix for somehow sets off uninited values
     memset(node, 0, sizeof(struct tree));
 
-    node->mark = col_get2(colprio);
+    // TODO: fucking wrappare. Add full support for user defined columns as well
+    if (colprio == 1)
+        node->mark = '*';
+    else if (colprio == 2)
+        node->mark = '^';
+    else
+        node->mark = '+';
+
     node->colprio = colprio;
     strncpy(node->id, id, IDSIZ);
     strncpy(node->desc, desc, DESCSIZ);

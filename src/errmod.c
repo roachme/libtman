@@ -33,7 +33,19 @@ const char *errcodes[__LIBTMAN_STATUS_LAST] = {
     [LIBTMAN_PRJ_DEL_PREV] = "could not unmark previous project",
     [LIBTMAN_PRJ_MISSING] = "project name missing",
 
+    [LIBTMAN_BRD_LOAD] = "could not load board names",
+    [LIBTMAN_BRD_SAVE] = "could not save board names",
+    [LIBTMAN_BRD_SWAP] = "could not swap boards",
+    [LIBTMAN_BRD_TOOLONG] = "board name is too long, limit is " xstr(PRJSIZ),
+    [LIBTMAN_BRD_ILLEG] = "illegal board name",
     [LIBTMAN_BRD_NOCURR] = "no current board",
+    [LIBTMAN_BRD_NOPREV] = "no previous board",
+    [LIBTMAN_BRD_NOSUCH] = "no such board",
+    [LIBTMAN_BRD_EXISTS] = "board already exists",
+    [LIBTMAN_BRD_SWITCH] = "could not switch to board",
+    [LIBTMAN_BRD_DEL_CURR] = "could not unmark current board",
+    [LIBTMAN_BRD_DEL_PREV] = "could not unmark previous board",
+    [LIBTMAN_BRD_MISSING] = "board name missing",
 
     [LIBTMAN_ID_ILLEG] = "illegal task ID",
     [LIBTMAN_ID_TOOLONG] = "task ID is too long, limit is " xstr(IDSIZ),
@@ -44,6 +56,7 @@ const char *errcodes[__LIBTMAN_STATUS_LAST] = {
     [LIBTMAN_ID_SWAP] = "could not swap task IDs",
 
     [LIBTMAN_COL_ADD] = "could not add task to default column",
+    [LIBTMAN_COL_GET] = "could not get column name",
     [LIBTMAN_COL_MOVE] = "could not move task to column",
     [LIBTMAN_COL_DEL] = "could not delete task from column",
     [LIBTMAN_COL_EXISTS] = "column does not exist",
@@ -57,11 +70,13 @@ const char *errcodes[__LIBTMAN_STATUS_LAST] = {
     [LIBTMAN_DIR_PRJ_MAKE] = "could not create prj directory",
     [LIBTMAN_DIR_PRJ_OPEN] = "could not open prj directory",
 
-    [LIBTMAN_UNIT_SET] = "could not set unit values",
-    [LIBTMAN_UNIT_GET] = "could not get unit values",
     [LIBTMAN_UNIT_DEL] = "could not delete task unit",
-    [LIBTMAN_UNIT_MAKE] = "could not create task unit",
+    [LIBTMAN_UNIT_GET] = "could not get unit values",
     [LIBTMAN_UNIT_ILLEG] = "illegal unit value",
+    [LIBTMAN_UNIT_KEY] = "unit key does not exist",
+    [LIBTMAN_UNIT_LOAD] = "could not load units",
+    [LIBTMAN_UNIT_MAKE] = "could not create task unit",
+    [LIBTMAN_UNIT_SET] = "could not set unit values",
 
     [LIBTMAN_CMD_BIN] = "no such command",
     [LIBTMAN_CMD_PGN] = "no such plugin",
@@ -94,4 +109,13 @@ const char *emod_strerror(void)
     if (errcode < 0 || errcode >= __LIBTMAN_STATUS_LAST)
         return strncpy(errmsg, "internal unknown error", ERRMSGSIZ);
     return strncpy(errmsg, errcodes[errcode], ERRMSGSIZ);
+}
+
+const char *emod_strerror_get(int status)
+{
+    static char errmsg[ERRMSGSIZ + 1];
+
+    if (status < 0 || status >= __LIBTMAN_STATUS_LAST)
+        return strncpy(errmsg, "internal unknown error", ERRMSGSIZ);
+    return strncpy(errmsg, errcodes[status], ERRMSGSIZ);
 }

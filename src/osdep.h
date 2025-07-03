@@ -1,5 +1,5 @@
-#ifndef OSDEP_H
-#define OSDEP_H
+#ifndef LIBTMAN_OSDEP_H
+#define LIBTMAN_OSDEP_H
 
 #include "common.h"
 

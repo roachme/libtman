@@ -4,6 +4,24 @@
 #include "errmod.h"
 #include "tree.h"
 
+struct mylist {
+    char *id;
+    int status;                 // status code for invalid objects
+    int colprio;                // maybe there's no need, cuz we are gonna use linked list
+    char *colname;              // maybe?...  even for custom column, just read value from file
+    int shown;
+    struct mylist *next;
+};
+
+struct objlist {
+    struct mylist *curr;
+    struct mylist *prev;
+    struct mylist *blog;
+    struct mylist *done;
+    struct mylist *custom;
+    struct mylist *inval;
+};
+
 typedef struct tman_arg tman_arg_t;
 typedef struct tman_base tman_base_t;
 typedef struct tman_unit tman_unit_t;
@@ -11,9 +29,9 @@ typedef struct tman_option tman_opt_t;
 typedef struct tman_context tman_ctx_t;
 
 struct tman_arg {
-    char *id;
-    char *brd;
     char *prj;
+    char *brd;
+    char *task;
 };
 
 struct tman_base {
@@ -28,9 +46,9 @@ struct tman_unit {
 };
 
 struct tman_option {
-    int id_switch;
     int brd_switch;
     int prj_switch;
+    int task_switch;
 };
 
 /* TODO: maybe it's better to move it cli part?  */
@@ -45,8 +63,15 @@ struct tman_context {
     char *colname;
     struct tman_unit *unitbin;
     struct tman_unit *unitpgn;
-    struct tree *ids;
+    struct tman_unit *unitbrd;  /* NOTE: needed for auto board creation with project.  */
     struct tree *prjs;
+    struct tree *brds;
+
+    struct objlist *ids;
+
+    struct tree *invids;
+    struct tree *invprjs;
+    struct tree *invbrds;
 };
 
 /* Core functions.  */
@@ -57,21 +82,27 @@ tman_ctx_t *tman_deinit(tman_ctx_t * ctx);
 /* Core util functions.  */
 int tman_mkfs(void);
 const char *tman_strerror(void);
+const char *tman_strerror_get(int status);
 
 /* Data structure.  */
 tman_unit_t *tman_unit_add(tman_unit_t * head, char *key, char *val);
-void *tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+char *tman_unit_get(tman_unit_t * head, char *key);
+void tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+
+/* Util functions */
+tman_unit_t *tman_task_get_units(tman_arg_t * args);
+void tman_unit_free_2(tman_unit_t * units);
 
 /* Input argument functions.  */
-int tman_check_arg_id(tman_arg_t * args);
-int tman_check_arg_id_exist(tman_arg_t * args);
+int tman_check_arg_task(tman_arg_t * args);
+int tman_check_arg_task_exist(tman_arg_t * args);
 int tman_check_arg_brd(tman_arg_t * args);
 int tman_check_arg_prj(tman_arg_t * args);
 
 /* Task functions.  */
 int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
-int tman_task_col(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_task_flow(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst);
 int tman_task_prev(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
@@ -80,14 +111,14 @@ int tman_task_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 
 /* Board functions.  */
-int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
-int tman_prj_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
-int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * opts);
-int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * opts);
-int tman_prj_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst);
-int tman_prj_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
-int tman_prj_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
-int tman_prj_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_brd_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_brd_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_brd_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_brd_prev(tman_ctx_t * ctx, tman_opt_t * opts);
+int tman_brd_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst);
+int tman_brd_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_brd_show(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_brd_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 
 /* Project functions.  */
 int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
