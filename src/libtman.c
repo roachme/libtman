@@ -21,7 +21,19 @@ struct tmanstruct tmanfs;
 
 typedef struct mylist mylist_t;
 
-// objs->curr = add_list_node(objs->curr, args->task, NULL, status);
+static void tman_mylist_free(struct mylist *head)
+{
+    struct mylist *p, *q;
+
+    for (p = head; p != NULL; p = q) {
+        q = p->next;
+        free(p->id);
+        if (p->colname)
+            free(p->colname);
+        free(p);
+    }
+}
+
 static mylist_t *add_list_node(mylist_t * head, char *id, char *colname,
                                int status)
 {
@@ -334,24 +346,10 @@ char *tman_unit_get(tman_unit_t * head, char *key)
     return unit_get(head, key);
 }
 
-tman_unit_t *tman_task_get_units(tman_arg_t * args)
-{
-    char *pathname;
-
-    if ((pathname = path_task_unit(tmanfs.base, args)) == NULL)
-        return NULL;
-    return unit_load(pathname);
-}
-
 void tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     unit_free(ctx->unitbin);
     ctx->unitbin = NULL;
-}
-
-void tman_unit_free_2(tman_unit_t * units)
-{
-    unit_free(units);
 }
 
 int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
@@ -492,7 +490,7 @@ int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * opts)
     int status;
     tman_arg_t args;
 
-    args.brd = args.task = NULL;
+    args.prj = args.brd = args.task = NULL;
     if ((args.prj = column_project_curr(tmanfs.base, &args))
         && (status = tman_check_arg_prj(&args)))
         return status;
@@ -765,19 +763,6 @@ const char *tman_strerror(void)
 const char *tman_strerror_get(int status)
 {
     return emod_strerror_get(status);
-}
-
-static void tman_mylist_free(struct mylist *head)
-{
-    struct mylist *p, *q;
-
-    for (p = head; p != NULL; p = q) {
-        q = p->next;
-        free(p->id);
-        if (p->colname)
-            free(p->colname);
-        free(p);
-    }
 }
 
 tman_ctx_t *tman_deinit(tman_ctx_t * ctx)

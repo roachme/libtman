@@ -63,13 +63,12 @@ struct tman_context {
     char *colname;
     struct tman_unit *unitbin;
     struct tman_unit *unitpgn;
-    struct tman_unit *unitbrd;  /* NOTE: needed for auto board creation with project.  */
+    struct tman_unit *unitbrd;
     struct tree *prjs;
     struct tree *brds;
-
     struct objlist *ids;
 
-    struct tree *invids;
+    /* TODO: use 'struct objlist' and get rid of struct's below.  */
     struct tree *invprjs;
     struct tree *invbrds;
 };
@@ -88,10 +87,6 @@ const char *tman_strerror_get(int status);
 tman_unit_t *tman_unit_add(tman_unit_t * head, char *key, char *val);
 char *tman_unit_get(tman_unit_t * head, char *key);
 void tman_unit_free(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
-
-/* Util functions */
-tman_unit_t *tman_task_get_units(tman_arg_t * args);
-void tman_unit_free_2(tman_unit_t * units);
 
 /* Input argument functions.  */
 int tman_check_arg_task(tman_arg_t * args);
