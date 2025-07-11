@@ -441,7 +441,6 @@ int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * opts)
     int colprio = 1;
     char *cprj, *pprj;
     tman_arg_t args;
-    char pgnout[PGNOUTSIZ + 1] = { 0 };
 
     if ((edir = opendir(tmanfs.base)) == NULL)
         return emod_set(LIBTMAN_DIR_PRJ_OPEN);
@@ -458,12 +457,12 @@ int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * opts)
         if (ent->d_name[0] == '.' || ent->d_type != DT_DIR)
             continue;
         else if ((status = tman_check_arg_prj(&args))) {
-            node = tree_alloc(ent->d_name, 1, "", "");
+            node = tree_alloc(ent->d_name, 1, "");
             node->status = status;
             ctx->invprjs = tree_add(ctx->invprjs, node);
             continue;
         } else if (!(units = unit_load(path_prj_unit(tmanfs.base, &args)))) {
-            node = tree_alloc(ent->d_name, 1, "", "");
+            node = tree_alloc(ent->d_name, 1, "");
             node->status = LIBTMAN_UNIT_GET;
             ctx->invprjs = tree_add(ctx->invprjs, node);
             continue;
@@ -475,8 +474,7 @@ int tman_prj_list(tman_ctx_t * ctx, tman_opt_t * opts)
             colprio = 2;
         else
             colprio = 3;
-        node =
-            tree_alloc(ent->d_name, colprio, unit_get(units, "desc"), pgnout);
+        node = tree_alloc(ent->d_name, colprio, unit_get(units, "desc"));
         ctx->prjs = tree_add(ctx->prjs, node);
         unit_free(units);
     }
@@ -630,7 +628,6 @@ int tman_brd_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     struct tree *node;
     int colprio, status;
     char *brd_curr, *brd_prev;
-    char pgnout[PGNOUTSIZ + 1] = { 0 };
 
     if ((status = tman_check_arg_prj(args)))
         return status;
@@ -651,12 +648,12 @@ int tman_brd_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
         if (ent->d_name[0] == '.' || ent->d_type != DT_DIR)
             continue;
         else if ((status = tman_check_arg_brd(args))) {
-            node = tree_alloc(ent->d_name, 1, "", "");
+            node = tree_alloc(ent->d_name, 1, "");
             node->status = status;
             ctx->invbrds = tree_add(ctx->invbrds, node);
             continue;
         } else if (!(units = unit_load(path_brd_unit(tmanfs.base, args)))) {
-            node = tree_alloc(ent->d_name, 1, "", "");
+            node = tree_alloc(ent->d_name, 1, "");
             node->status = LIBTMAN_UNIT_GET;
             ctx->invbrds = tree_add(ctx->invbrds, node);
             continue;
@@ -669,8 +666,7 @@ int tman_brd_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
             colprio = 2;
         else
             colprio = 3;
-        node =
-            tree_alloc(ent->d_name, colprio, unit_get(units, "desc"), pgnout);
+        node = tree_alloc(ent->d_name, colprio, unit_get(units, "desc"));
         ctx->brds = tree_add(ctx->brds, node);
         unit_free(units);
     }

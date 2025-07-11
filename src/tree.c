@@ -6,7 +6,7 @@
 #include "column.h"
 #include "common.h"
 
-struct tree *tree_alloc(char *id, int colprio, char *desc, char *pgnout)
+struct tree *tree_alloc(char *id, int colprio, char *desc)
 {
     struct tree *node;
 
@@ -27,7 +27,6 @@ struct tree *tree_alloc(char *id, int colprio, char *desc, char *pgnout)
     node->colprio = colprio;
     strncpy(node->id, id, IDSIZ);
     strncpy(node->desc, desc, DESCSIZ);
-    strncpy(node->pgnout, pgnout, PGNOUTSIZ);
     node->left = node->right = NULL;
     return node;
 }
@@ -52,14 +51,4 @@ struct tree *tree_free(struct tree *parent)
         free(parent);
     }
     return NULL;
-}
-
-void tree_print(struct tree *parent)
-{
-    if (parent != NULL) {
-        tree_print(parent->left);
-        printf("-> %c %s [%s] '%s'\n", parent->mark, parent->id,
-               parent->pgnout, parent->desc);
-        tree_print(parent->right);
-    }
 }
