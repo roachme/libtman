@@ -236,9 +236,8 @@ int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     struct tman_unit *units;
     struct objlist *objs;
 
-    objs = malloc(sizeof(struct objlist));
-    memset(objs, 0, sizeof(struct objlist));
-
+    if ((objs = calloc(1, sizeof(struct objlist))) == NULL)
+        return emod_set(LIBTMAN_MALLOC);
     if ((status = tman_check_arg_prj(args)) != LIBTMAN_OK)
         return status;
     if ((status = tman_check_arg_brd(args)) != LIBTMAN_OK)

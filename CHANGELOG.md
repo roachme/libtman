@@ -5,6 +5,7 @@
 - `VERSION`: Add inital version
 - `cli/libtman`: Add function to check if task ID exists
 - `src`: Add skeleton for board functions
+- `src`: Add new error code for memory failure
 
 ### Changed
 

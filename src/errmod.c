@@ -18,6 +18,7 @@ const char *errcodes[__LIBTMAN_STATUS_LAST] = {
     [LIBTMAN_EOPENPRJDIR] = "could not open project directory",
     [LIBTMAN_EINIT_PRJMOD] = "could not init module prj",
     [LIBTMAN_SYS_FS] = "could not create directory",
+    [LIBTMAN_MALLOC] = "could not malloc memory",
 
     [LIBTMAN_PRJ_LOAD] = "could not load project names",
     [LIBTMAN_PRJ_SAVE] = "could not save project names",
