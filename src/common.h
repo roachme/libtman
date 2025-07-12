@@ -17,9 +17,6 @@
 #define BOOL            int
 #define TRUE            1
 #define FALSE           0
-#define IDSIZ           10
-#define PRJSIZ          10
-#define BRDSIZ          10
 #define PATHSIZ         4096
 #define TMANPATHSIZE    1024
 #define FINITSIZ TMANPATHSIZE + 6 + 10  /* filename + padding */

@@ -1,13 +1,13 @@
 /*
-    Define util limitations in one place.
+    Define library limitations in one place.
 */
 
 #ifndef LIBTMAN_LIMIT_H
 #define LIBTMAN_LIMIT_H
 
-/* roachme: delete these constrains */
-
-/* Config file limits */
-#define NCOLUMNS    10          /* max number of columns per project */
+/* TODO: delete these constrains */
+#define IDSIZ           10
+#define BRDSIZ          10
+#define PRJSIZ          10
 
 #endif
