@@ -1,3 +1,10 @@
+## [Unreleased]
+
+### Fixed
+
+- `src/libtman`: Fix potential memory leak
+
+
 ## [0.0.20] - (2025-07-10)
 
 ### Added

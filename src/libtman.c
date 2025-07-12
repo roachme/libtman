@@ -355,7 +355,6 @@ int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
     char *pathname;
-    struct tman_unit *item;
     struct tman_unit *units;
 
     if ((status = check_args(args)))
@@ -365,13 +364,12 @@ int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     else if ((units = unit_load(pathname)) == NULL)
         return emod_set(LIBTMAN_NODEF_ERR);
 
-    for (item = ctx->unitbin; item; item = item->next) {
+    for (struct tman_unit * item = ctx->unitbin; item; item = item->next)
         unit_set(units, item->key, item->val);
-    }
     if (unit_save(pathname, units))
-        return emod_set(LIBTMAN_UNIT_SET);
+        status = LIBTMAN_UNIT_SET;
     unit_free(units);
-    return LIBTMAN_OK;
+    return status;
 }
 
 int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
