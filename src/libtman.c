@@ -15,8 +15,7 @@
 #include "path.h"
 #include "valid.h"
 
-// TODO: Make NOT global.
-struct tmanstruct tmanfs;
+static struct tmanstruct tmanfs;
 
 typedef struct mylist mylist_t;
 

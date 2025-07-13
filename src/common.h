@@ -30,6 +30,4 @@ struct tmanstruct {
     char fcfg[TMANPATHSIZE + 1];        /* system config file */
 };
 
-extern struct tmanstruct tmanfs;
-
 #endif
