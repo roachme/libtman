@@ -83,6 +83,8 @@ const char *errcodes[__LIBTMAN_STATUS_LAST] = {
     [LIBTMAN_CMD_PGN] = "no such plugin",
     [LIBTMAN_CMD_GEN] = "no such command or plugin",
 
+    [LIBTMAN_VALID_COLUMN] = "invalid column name",
+
     /* HOTFIX: delete it once error code table is filled.  */
     /* Not yet defined error messages.  */
     [LIBTMAN_NODEF_ERR] = "not yet defined error messages",

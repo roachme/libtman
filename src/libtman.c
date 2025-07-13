@@ -4,17 +4,16 @@
 #include <dirent.h>
 
 #include "dir.h"
-#include "board.h"
 #include "column.h"
-#include "project.h"
+#include "limit.h"
 #include "unit.h"
 #include "libtman.h"
 #include "tree.h"
-#include "task.h"
 #include "common.h"
 #include "osdep.h"
 #include "errmod.h"
 #include "path.h"
+#include "valid.h"
 
 // TODO: Make NOT global.
 struct tmanstruct tmanfs;
@@ -63,6 +62,24 @@ static int check_args(tman_arg_t * args)
     return status;
 }
 
+static int project_exist(char *base, tman_arg_t * args)
+{
+    char *pathname = path_prj_dir(base, args);
+    return ISDIR(pathname);
+}
+
+static int board_exist(char *base, tman_arg_t * args)
+{
+    char *pathname = path_brd_dir(base, args);
+    return ISDIR(pathname);
+}
+
+static int task_exist(char *base, const tman_arg_t * args)
+{
+    char *pathname = path_task_dir(base, args);
+    return ISDIR(pathname);
+}
+
 static tman_ctx_t *make_context(void)
 {
     tman_ctx_t *ctx;
@@ -94,9 +111,9 @@ int tman_check_arg_task(tman_arg_t * args)
     if (args->task == NULL
         && (args->task = column_task_curr(tmanfs.base, args)) == NULL)
         return emod_set(LIBTMAN_ID_NOCURR);
-    else if (task_is_valid_name(args->task) == FALSE)
+    else if (valid_task_name(args->task) == FALSE)
         return emod_set(LIBTMAN_ID_ILLEG);
-    else if (task_is_valid_length(args->task) == FALSE)
+    else if (limit_task_ok(args->task) == FALSE)
         return emod_set(LIBTMAN_ID_TOOLONG);
     else if (task_exist(tmanfs.base, args) == FALSE)
         return emod_set(LIBTMAN_ID_NOSUCH);
@@ -108,9 +125,9 @@ int tman_check_arg_brd(tman_arg_t * args)
     if (args->brd == NULL
         && (args->brd = column_board_curr(tmanfs.base, args)) == NULL)
         return emod_set(LIBTMAN_BRD_NOCURR);
-    else if (board_is_valid_name(args->brd) == FALSE)
+    else if (valid_board_name(args->brd) == FALSE)
         return emod_set(LIBTMAN_BRD_ILLEG);
-    else if (board_is_valid_length(args->brd) == FALSE)
+    else if (limit_board_ok(args->brd) == FALSE)
         return emod_set(LIBTMAN_BRD_TOOLONG);
     else if (board_exist(tmanfs.base, args) == FALSE)
         return emod_set(LIBTMAN_BRD_NOSUCH);
@@ -122,9 +139,9 @@ int tman_check_arg_prj(tman_arg_t * args)
     if (args->prj == NULL
         && (args->prj = column_project_curr(tmanfs.base, args)) == NULL)
         return emod_set(LIBTMAN_PRJ_NOCURR);
-    else if (project_is_valid_name(args->prj) == FALSE)
+    else if (valid_project_name(args->prj) == FALSE)
         return emod_set(LIBTMAN_PRJ_ILLEG);
-    else if (project_is_valid_length(args->prj) == FALSE)
+    else if (limit_project_ok(args->prj) == FALSE)
         return emod_set(LIBTMAN_PRJ_TOOLONG);
     else if (project_exist(tmanfs.base, args) == FALSE)
         return emod_set(LIBTMAN_PRJ_NOSUCH);
@@ -204,10 +221,10 @@ int tman_task_flow(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
-    /* TODO: make column_task_move() failure more descriptive.  */
-
     if ((status = check_args(args)))
         return status;
+    else if (valid_column_name(ctx->colname) == FALSE)
+        return emod_set(LIBTMAN_VALID_COLUMN);
     else if (column_task_move(tmanfs.base, args, ctx->colname))
         return emod_set(LIBTMAN_COL_MOVE);
     return LIBTMAN_OK;
@@ -513,9 +530,9 @@ int tman_prj_rename(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
         return emod_set(status);
     else if (project_exist(tmanfs.base, dst))
         return emod_set(LIBTMAN_PRJ_EXISTS);
-    else if (project_is_valid_name(dst->prj) != TRUE)
+    else if (valid_project_name(dst->prj) == FALSE)
         return emod_set(LIBTMAN_PRJ_ILLEG);
-    else if (project_is_valid_length(dst->prj) == FALSE)
+    else if (limit_project_ok(dst->prj) == FALSE)
         return emod_set(LIBTMAN_PRJ_TOOLONG);
 
     return dir_prj_rename(tmanfs.base, src, dst);

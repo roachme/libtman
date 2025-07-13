@@ -81,6 +81,8 @@ enum tman_err_enum {
     LIBTMAN_CMD_PGN,
     LIBTMAN_CMD_GEN,
 
+    LIBTMAN_VALID_COLUMN,
+
     LIBTMAN_NODEF_ERR,
 
     __LIBTMAN_STATUS_LAST

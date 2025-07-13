@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Added
+
+- `src`: Add name and length validation functions
+
 ### Fixed
 
 - `src/libtman`: Fix potential memory leak
