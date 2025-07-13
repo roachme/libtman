@@ -500,9 +500,6 @@ int tman_prj_prev(tman_ctx_t * ctx, tman_opt_t * opts)
 int tman_prj_rename(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
 {
     int status;
-    // roach
-    fprintf(stderr, "tman_prj_rename: ADD function column_project_is_curr()\n");
-    return 0;
 
     /* TODO: Use tman_check_arg_prj() to remove code duplication.  */
     if (src->prj == NULL)
@@ -521,13 +518,6 @@ int tman_prj_rename(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
     else if (project_is_valid_length(dst->prj) == FALSE)
         return emod_set(LIBTMAN_PRJ_TOOLONG);
 
-    // roachme: thoroughly test it, project column switch might cause problems
-    if (project_is_curr(src->prj) == TRUE) {
-        column_project_move(tmanfs.base, dst, COLUMN_CURR);
-    } else if (project_is_prev(src->prj) == TRUE) {
-        project_delprev();
-        column_project_move(tmanfs.base, dst, COLUMN_PREV);
-    }
     return dir_prj_rename(tmanfs.base, src, dst);
 }
 

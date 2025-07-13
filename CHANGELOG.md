@@ -3,6 +3,7 @@
 ### Fixed
 
 - `src/libtman`: Fix potential memory leak
+- `src/libtman`: Fix project renaming
 
 
 ## [0.0.20] - (2025-07-10)
