@@ -246,7 +246,7 @@ int tman_task_get(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
     return status;
 }
 
-int tman_task_flow(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
+int tman_task_column_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 

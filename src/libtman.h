@@ -98,12 +98,15 @@ int tman_check_arg_prj(tman_arg_t * args);
 int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_get(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
-int tman_task_flow(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst);
 int tman_task_prev(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
 int tman_task_sync(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);
+int tman_task_column_get(tman_ctx_t * ctx, tman_arg_t * args,
+                         tman_opt_t * opts);
+int tman_task_column_set(tman_ctx_t * ctx, tman_arg_t * args,
+                         tman_opt_t * opts);
 
 /* Board functions.  */
 int tman_brd_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts);

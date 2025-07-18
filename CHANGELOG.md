@@ -5,6 +5,10 @@
 - `src`: Add name and length validation functions
 - `src`: Add support to check board feature usage
 
+### Changed
+
+- `src/libtman`: Unify API function to get/set column
+
 ### Fixed
 
 - `src/libtman`: Fix potential memory leak
