@@ -150,6 +150,8 @@ int tman_check_arg_prj(tman_arg_t * args)
     if (args->prj == NULL
         && (args->prj = column_project_curr(tmanfs.base, args)) == NULL)
         return emod_set(LIBTMAN_PRJ_NOCURR);
+    else if (project_check_board(tmanfs.base, args) == FALSE)
+        return emod_set(LIBTMAN_PRJ_CHECK_BOARD);
     else if (valid_project_name(args->prj) == FALSE)
         return emod_set(LIBTMAN_PRJ_ILLEG);
     else if (limit_project_ok(args->prj) == FALSE)
