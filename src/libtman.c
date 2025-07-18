@@ -61,6 +61,18 @@ static int check_args(tman_arg_t * args)
     return status;
 }
 
+static int project_check_board(char *base, tman_arg_t * args)
+{
+    char *pathname = path_prj_board(base, args);
+    return ISFILE(pathname);
+}
+
+static int project_add_board(char *base, tman_arg_t * args)
+{
+    char *pathname = path_prj_board(base, args);
+    return TOUCH(pathname);
+}
+
 static int project_exist(char *base, tman_arg_t * args)
 {
     char *pathname = path_prj_dir(base, args);
@@ -144,6 +156,8 @@ int tman_check_arg_prj(tman_arg_t * args)
         return emod_set(LIBTMAN_PRJ_TOOLONG);
     else if (project_exist(tmanfs.base, args) == FALSE)
         return emod_set(LIBTMAN_PRJ_NOSUCH);
+    else if (project_check_board(tmanfs.base, args) == FALSE)
+        return emod_set(LIBTMAN_PRJ_CHECK_BOARD);
     return LIBTMAN_OK;
 }
 
@@ -568,12 +582,16 @@ int tman_prj_add(tman_ctx_t * ctx, tman_arg_t * args, tman_opt_t * opts)
 {
     int status;
 
+    status = tman_check_arg_prj(args);
+
     /* Special case: board should not exists. If this's a case - let it go. */
-    if ((status = tman_check_arg_prj(args)) != LIBTMAN_PRJ_NOSUCH)
-        return emod_set(LIBTMAN_PRJ_EXISTS);
+    if (status != LIBTMAN_PRJ_NOSUCH && status != LIBTMAN_PRJ_CHECK_BOARD)
+        return emod_set(status);
 
     if (dir_prj_add(tmanfs.base, args))
         return emod_set(LIBTMAN_DIR_PRJ_MAKE);
+    else if (project_add_board(tmanfs.base, args))
+        return emod_set(LIBTMAN_PRJ_ADD_BOARD);
     else if (opts->prj_switch
              && column_project_move(tmanfs.base, args, COLUMN_CURR))
         return emod_set(LIBTMAN_PRJ_SWITCH);

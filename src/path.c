@@ -6,7 +6,15 @@
 
 // TODO: add generic function using varg to generate path
 
-/* Generate path object directories.  */
+char *path_prj_board(const char *base, const tman_arg_t * args)
+{
+    const char *fmt = "%s/%s/.tman/useboard";
+    static char pathname[PATH_MAX + 1];
+    sprintf(pathname, fmt, base, args->prj);
+    //printf("path.c: %s:pathname: '%s'\n", __func__, mypath);
+    return pathname;
+}
+
 char *path_prj_dir(char *base, const tman_arg_t * args)
 {
     const char *fmt = "%s/%s";

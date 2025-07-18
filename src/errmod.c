@@ -33,6 +33,8 @@ const char *errcodes[__LIBTMAN_STATUS_LAST] = {
     [LIBTMAN_PRJ_DEL_CURR] = "could not unmark current project",
     [LIBTMAN_PRJ_DEL_PREV] = "could not unmark previous project",
     [LIBTMAN_PRJ_MISSING] = "project name missing",
+    [LIBTMAN_PRJ_CHECK_BOARD] = "board support is disabled in project",
+    [LIBTMAN_PRJ_ADD_BOARD] = "could not add board support in project",
 
     [LIBTMAN_BRD_LOAD] = "could not load board names",
     [LIBTMAN_BRD_SAVE] = "could not save board names",

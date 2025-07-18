@@ -3,6 +3,7 @@
 ### Added
 
 - `src`: Add name and length validation functions
+- `src`: Add support to check board feature usage
 
 ### Fixed
 
