@@ -7,8 +7,8 @@ struct tree {
     int mark;
     int status;                 /* error code in case of invalid value */
     int colprio;
-    char id[IDSIZ + 1];
-    char desc[DESCSIZ + 1];
+    char *id;
+    char *desc;
     struct tree *left;
     struct tree *right;
 };

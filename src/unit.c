@@ -1,47 +1,85 @@
 #include <stdio.h>
+#include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
 #include "unit.h"
 
-int unit_save(char *filename, struct tman_unit *units)
+#define UNIT_DELIM        ":\n"
+#define UNIT_FMT          "%s : %s\n"
+
+static char *trim_whitespace_end(char *str)
+{
+    size_t len;
+
+    len = strlen(str) - 1;
+    while (len >= 0 && isspace(*(str + len)))
+        len--;
+    str[len + 1] = '\0';
+    return str;
+}
+
+static char *trim_whitespace_beg(char *str)
+{
+    while ((isspace(*str)))
+        str++;
+    return str;
+}
+
+static char *trim_whitespace(char *str)
+{
+    str = trim_whitespace_beg(str);
+    str = trim_whitespace_end(str);
+    return str;
+}
+
+int unit_save(const char *filename, tman_unit_t * units)
 {
     FILE *fp;
 
-    if ((fp = fopen(filename, "w")) == NULL) {
-        fprintf(stderr, "unit_save: failed to open file: '%s'\n", filename);
+    if ((fp = fopen(filename, "w")) == NULL)
         return 1;
-    }
 
-    for (; units; units = units->next)
-        fprintf(fp, "%s : %s\n", units->key, units->val);
+    for (tman_unit_t * unit = units; unit; unit = unit->next)
+        fprintf(fp, UNIT_FMT, unit->key, unit->val);
     return fclose(fp);
+}
+
+tman_unit_t *unit_parse(tman_unit_t * units, const char *str)
+{
+    char *token;
+    char key[BUFSIZ + 1];
+    char val[BUFSIZ + 1];
+    char buf[BUFSIZ + 1];
+
+    strcpy(buf, str);
+    buf[BUFSIZ] = '\0';
+    key[0] = val[0] = '\0';
+
+    if ((token = strtok(buf, UNIT_DELIM)) != NULL)
+        strcpy(key, trim_whitespace(token));
+    if ((token = strtok(NULL, UNIT_DELIM)) != NULL)
+        strcpy(val, trim_whitespace(token));
+    if (key[0] != '\0' && val[0] != '\0')
+        units = unit_add(units, key, val);
+    return units;
 }
 
 /*
  * Get units all units.
 */
-struct tman_unit *unit_load(char *filename)
+tman_unit_t *unit_load(const char *filename)
 {
     FILE *fp;
-    struct tman_unit *units;
     char buf[BUFSIZ + 1];
-    char key[KEYSIZ + 1];
-    char val[VALSIZ + 1];
+    tman_unit_t *units;
 
     if ((fp = fopen(filename, "r")) == NULL)
         return NULL;
 
-    // TODO: write a better parser
     units = NULL;
-    while (fgets(buf, BUFSIZ, fp) != NULL) {
-        char *token;
-        if ((token = strtok(buf, " :\n")) != NULL)
-            strcpy(key, token);
-        if ((token = strtok(NULL, ":\n")) != NULL)
-            strcpy(val, token);
-        units = unit_add(units, key, &val[1]);
-    }
+    while (fgets(buf, BUFSIZ, fp) != NULL)
+        units = unit_parse(units, buf);
     fclose(fp);
     return units;
 }
@@ -49,18 +87,17 @@ struct tman_unit *unit_load(char *filename)
 /*
  * Add units one at a time.
 */
-struct tman_unit *unit_add(struct tman_unit *head, char *key, char *val)
+tman_unit_t *unit_add(tman_unit_t * head, char *key, char *val)
 {
-    struct tman_unit *unit, *tmp;
+    tman_unit_t *unit, *tmp;
 
-    if ((unit = malloc(sizeof(struct tman_unit))) == NULL)
+    if ((unit = malloc(sizeof(tman_unit_t))) == NULL)
         return head;
 
     unit->next = NULL;
-    unit->key = strdup(key);
-    unit->val = strdup(val);
-
-    if ((tmp = head) == NULL)
+    if (!(unit->key = strdup(key)) || !(unit->val = strdup(val)))
+        return unit;
+    else if ((tmp = head) == NULL)
         return unit;
 
     for (tmp = head; tmp && tmp->next; tmp = tmp->next) ;
@@ -71,7 +108,7 @@ struct tman_unit *unit_add(struct tman_unit *head, char *key, char *val)
 /*
  * Set units one at a time.
 */
-int unit_set(struct tman_unit *head, char *key, char *val)
+int unit_set(tman_unit_t * head, const char *key, const char *val)
 {
     for (; head != NULL; head = head->next) {
         if (strcmp(head->key, key) == 0) {
@@ -80,31 +117,31 @@ int unit_set(struct tman_unit *head, char *key, char *val)
             return 0;
         }
     }
+    // Add new node
+    //return unit_add(head, key, val);
     return 1;
 }
 
-char *unit_get(struct tman_unit *head, char *key)
+/* TODO: make return value 'const char *'.  */
+char *unit_get(tman_unit_t * head, const char *key)
 {
-    while (head) {
-        if (strcmp(head->key, key) == 0)
-            return head->val;
-        head = head->next;
-    }
+    for (tman_unit_t * unit = head; unit; unit = unit->next)
+        if (strcmp(unit->key, key) == 0)
+            return unit->val;
     return NULL;
 }
 
 /*
  * Delete all units.
 */
-void unit_free(struct tman_unit *units)
+void unit_free(tman_unit_t * head)
 {
-    struct tman_unit *tmp;
+    tman_unit_t *curr, *next;
 
-    while (units) {
-        tmp = units->next;
-        free(units->key);
-        free(units->val);
-        free(units);
-        units = tmp;
+    for (curr = head; curr; curr = next) {
+        next = curr->next;
+        free(curr->key);
+        free(curr->val);
+        free(curr);
     }
 }

@@ -3,14 +3,12 @@
 
 #include "libtman.h"
 
-#define KEYSIZ 20
-#define VALSIZ 80
-
-void unit_free(struct tman_unit *units);
-struct tman_unit *unit_load(char *filename);
-char *unit_get(struct tman_unit *head, char *key);
-int unit_set(struct tman_unit *head, char *key, char *val);
-int unit_save(char *filename, struct tman_unit *units);
-struct tman_unit *unit_add(struct tman_unit *head, char *key, char *val);
+tman_unit_t *unit_load(const char *filename);
+tman_unit_t *unit_parse(tman_unit_t * head, const char *str);
+tman_unit_t *unit_add(tman_unit_t * head, char *key, char *val);
+int unit_set(tman_unit_t * head, const char *key, const char *val);
+int unit_save(const char *filename, tman_unit_t * head);
+char *unit_get(tman_unit_t * head, const char *key);
+void unit_free(tman_unit_t * head);
 
 #endif

@@ -1,10 +1,7 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "tree.h"
-#include "column.h"
-#include "common.h"
 
 struct tree *tree_alloc(char *id, int colprio, char *desc)
 {
@@ -25,8 +22,10 @@ struct tree *tree_alloc(char *id, int colprio, char *desc)
         node->mark = '+';
 
     node->colprio = colprio;
-    strncpy(node->id, id, IDSIZ);
-    strncpy(node->desc, desc, DESCSIZ);
+    /*
+       strncpy(node->id, id, IDSIZ);
+       strncpy(node->desc, desc, DESCSIZ);
+     */
     node->left = node->right = NULL;
     return node;
 }
