@@ -2,7 +2,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
+
 #include "unit.h"
 
 #define UNIT_DELIM        ":\n"
@@ -96,11 +96,12 @@ tman_unit_t *unit_add(tman_unit_t * head, char *key, char *val)
 
     unit->next = NULL;
     if (!(unit->key = strdup(key)) || !(unit->val = strdup(val)))
-        return unit;
+        return head;
     else if ((tmp = head) == NULL)
         return unit;
 
-    for (tmp = head; tmp && tmp->next; tmp = tmp->next) ;
+    while (tmp->next)
+        tmp = tmp->next;
     tmp->next = unit;
     return head;
 }

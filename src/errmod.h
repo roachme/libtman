@@ -4,7 +4,7 @@
 #define ERRMSGSIZ   100
 #define NERRCODE    50
 
-enum tman_err_enum {
+enum tman_errno {
     LIBTMAN_OK,                 /* OK, interpret output as path or output */
 
     LIBTMAN_DB,
@@ -74,12 +74,11 @@ enum tman_err_enum {
 };
 
 struct tman_err_codes {
-    enum tman_err_enum err;
+    enum tman_errno err;
     char desc[ERRMSGSIZ + 1];
 };
 
 int emod_set(int err);
-const char *emod_strerror(void);
-const char *emod_strerror_get(int status);
+char *emod_strerror(int errnum);
 
 #endif

@@ -73,25 +73,16 @@ const char *errcodes[__LIBTMAN_STATUS_LAST] = {
 int emod_set(int err)
 {
     errcode = err;
-    if (errcode < 0 || errcode >= __LIBTMAN_STATUS_LAST)
+    if (errcode < 0 || errcode > __LIBTMAN_STATUS_LAST)
         errcode = -1;
     return errcode;
 }
 
-const char *emod_strerror(void)
+char *emod_strerror(int errnum)
 {
     static char errmsg[ERRMSGSIZ + 1];
 
-    if (errcode < 0 || errcode >= __LIBTMAN_STATUS_LAST)
+    if (errnum < 0 || errnum > __LIBTMAN_STATUS_LAST)
         return strncpy(errmsg, "internal unknown error", ERRMSGSIZ);
-    return strncpy(errmsg, errcodes[errcode], ERRMSGSIZ);
-}
-
-const char *emod_strerror_get(int status)
-{
-    static char errmsg[ERRMSGSIZ + 1];
-
-    if (status < 0 || status >= __LIBTMAN_STATUS_LAST)
-        return strncpy(errmsg, "internal unknown error", ERRMSGSIZ);
-    return strncpy(errmsg, errcodes[status], ERRMSGSIZ);
+    return strncpy(errmsg, errcodes[errnum], ERRMSGSIZ);
 }
