@@ -6,7 +6,7 @@
 #include "list.h"
 #include "valid.h"
 
-int aux_unit_set(tman_ctx_t * ctx, char *fname)
+int aux_unit_set(tman_unit_t * newunits, char *fname)
 {
     struct tman_unit *item;
     struct tman_unit *units;
@@ -16,7 +16,7 @@ int aux_unit_set(tman_ctx_t * ctx, char *fname)
 
     // TODO: check values in atomic way
 
-    for (item = ctx->units; item; item = item->next)
+    for (item = newunits; item; item = item->next)
         unit_set(units, item->key, item->val);
     if (unit_save(fname, units))
         return emod_set(LIBTMAN_UNIT_SAVE);
@@ -49,26 +49,4 @@ int aux_list_get(tman_ctx_t * ctx, char *fname)
 
     closedir(ids);
     return LIBTMAN_OK;
-}
-
-int aux_column_set(tman_ctx_t * ctx, char *fname)
-{
-    int status;
-    struct tman_unit *item;
-    struct tman_unit *column;
-
-    status = LIBTMAN_OK;
-    if ((column = unit_load(fname)) == NULL)
-        return emod_set(LIBTMAN_UNIT_LOAD);
-
-    /* Validate values in atomic way.  */
-    for (item = ctx->column; item; item = item->next)
-        if (valid_column_name(item->key) == FALSE)
-            return emod_set(LIBTMAN_COLUMN_KEY);
-
-    for (item = ctx->column; item; item = item->next)
-        unit_set(column, item->key, item->val);
-    if (unit_save(fname, column))
-        status = LIBTMAN_COLUMN_SAVE;
-    return status;
 }

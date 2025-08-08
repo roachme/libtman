@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <dirent.h>
 
@@ -221,7 +220,7 @@ int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args)
 
     if ((status = check_args(args)))
         return status;
-    return aux_unit_set(ctx, path_task_unit(tmanfs.base, args));
+    return aux_unit_set(ctx->units, path_task_unit(tmanfs.base, args));
 }
 
 int tman_task_column_get(tman_ctx_t * ctx, tman_arg_t * args)
@@ -243,7 +242,7 @@ int tman_task_column_set(tman_ctx_t * ctx, tman_arg_t * args)
 
     if ((status = check_args(args)))
         return status;
-    return aux_column_set(ctx, path_task_column(tmanfs.base, args));
+    return aux_unit_set(ctx->column, path_task_column(tmanfs.base, args));
 }
 
 int tman_board_add(tman_ctx_t * ctx, tman_arg_t * args)
@@ -316,7 +315,7 @@ int tman_board_set(tman_ctx_t * ctx, tman_arg_t * args)
 
     if ((status = check_args(args)))
         return status;
-    return aux_unit_set(ctx, path_brd_unit(tmanfs.base, args));
+    return aux_unit_set(ctx->units, path_brd_unit(tmanfs.base, args));
 }
 
 int tman_board_column_set(tman_ctx_t * ctx, tman_arg_t * args)
@@ -407,7 +406,7 @@ int tman_project_set(tman_ctx_t * ctx, tman_arg_t * args)
 
     if ((status = check_args(args)))
         return status;
-    return aux_unit_set(ctx, path_prj_unit(tmanfs.base, args));
+    return aux_unit_set(ctx->units, path_prj_unit(tmanfs.base, args));
 }
 
 int tman_project_column_set(tman_ctx_t * ctx, tman_arg_t * args)
