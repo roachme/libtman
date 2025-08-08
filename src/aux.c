@@ -57,6 +57,7 @@ int aux_column_set(tman_ctx_t * ctx, char *fname)
     struct tman_unit *item;
     struct tman_unit *column;
 
+    status = LIBTMAN_OK;
     if ((column = unit_load(fname)) == NULL)
         return emod_set(LIBTMAN_UNIT_LOAD);
 
