@@ -87,7 +87,7 @@ tman_unit_t *unit_load(const char *filename)
 /*
  * Add units one at a time.
 */
-tman_unit_t *unit_add(tman_unit_t * head, char *key, char *val)
+tman_unit_t *unit_add(tman_unit_t * head, const char *key, const char *val)
 {
     tman_unit_t *unit, *tmp;
 
@@ -109,18 +109,16 @@ tman_unit_t *unit_add(tman_unit_t * head, char *key, char *val)
 /*
  * Set units one at a time.
 */
-int unit_set(tman_unit_t * head, const char *key, const char *val)
+tman_unit_t *unit_set(tman_unit_t * head, const char *key, const char *val)
 {
     for (; head != NULL; head = head->next) {
         if (strcmp(head->key, key) == 0) {
             free(head->val);
             head->val = strdup(val);
-            return 0;
+            return head;
         }
     }
-    // Add new node
-    //return unit_add(head, key, val);
-    return 1;
+    return unit_add(head, key, val);
 }
 
 /* TODO: make return value 'const char *'.  */

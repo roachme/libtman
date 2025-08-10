@@ -41,8 +41,8 @@ const char *errcodes[__LIBTMAN_STATUS_LAST] = {
     [LIBTMAN_DIR_PRJ_OPEN] = "could not open project directory",
     [LIBTMAN_DIR_PRJ_RENAME] = "could not rename project",
 
-    [LIBTMAN_DIR_BRD_DEL] = "could not delete prj directory",
-    [LIBTMAN_DIR_BRD_MAKE] = "could not create prj directory",
+    [LIBTMAN_DIR_BRD_DEL] = "could not delete project directory",
+    [LIBTMAN_DIR_BRD_MAKE] = "could not create project directory",
     [LIBTMAN_DIR_BRD_MOVE] = "could not move board directory",
     [LIBTMAN_DIR_BRD_OPEN] = "could not open board directory",
 
@@ -51,12 +51,14 @@ const char *errcodes[__LIBTMAN_STATUS_LAST] = {
     [LIBTMAN_DIR_ID_MOVE] = "could not rename task directory",
     [LIBTMAN_DIR_ID_OPEN] = "could not open task directory",
 
-    [LIBTMAN_UNIT_DEL] = "could not delete task unit",
+    [LIBTMAN_UNIT_ADD] = "could not add unit node",
+    [LIBTMAN_UNIT_DEL] = "could not delete unit node",
     [LIBTMAN_UNIT_GET] = "could not get unit values",
     [LIBTMAN_UNIT_ILLEG] = "illegal unit value",
     [LIBTMAN_UNIT_KEY] = "unit key does not exist",
     [LIBTMAN_UNIT_LOAD] = "could not load units",
     [LIBTMAN_UNIT_SAVE] = "could not save unit values",
+    [LIBTMAN_UNIT_SET] = "could not set unit values",
 
     [LIBTMAN_COLUMN_DEL] = "could not delete task column",
     [LIBTMAN_COLUMN_GET] = "could not get column values",

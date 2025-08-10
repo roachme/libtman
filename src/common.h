@@ -1,20 +1,10 @@
 #ifndef LIBTMAN_COMMON_H
 #define LIBTMAN_COMMON_H
 
-/* use stdbool or add prefix or move it to cli part.  */
+/* TODO: use stdbool or add prefix or move it to cli part.  */
+#define BOOL            int
 #define TRUE        1
 #define FALSE       0
-
-#define BOOL            int
-#define TRUE            1
-#define FALSE           0
-#define PATHSIZ         4096
-#define TMANPATHSIZE    1024
-
-/* TODO: make it not global.  */
-struct tmanstruct {
-    char db[TMANPATHSIZE + 1];  /* directory for tman metadata */
-    char base[TMANPATHSIZE + 1];        /* directory for all stuff above */
-};
+#define NONEBOOL        -1      /* Not yet set boolean value */
 
 #endif

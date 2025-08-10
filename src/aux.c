@@ -6,7 +6,7 @@
 #include "list.h"
 #include "valid.h"
 
-int aux_unit_set(tman_unit_t * newunits, char *fname)
+int aux_unit_set(tman_unit_t * newunits, const char *fname)
 {
     struct tman_unit *item;
     struct tman_unit *units;
@@ -25,7 +25,7 @@ int aux_unit_set(tman_unit_t * newunits, char *fname)
     return LIBTMAN_OK;
 }
 
-int aux_list_get(tman_ctx_t * ctx, char *fname)
+int aux_list_get(tman_ctx_t * ctx, const char *fname)
 {
     DIR *ids;
     int status;

@@ -13,410 +13,233 @@
 #include "common.h"
 #include "libtman.h"
 
-static struct tmanstruct tmanfs;
+struct tmanstruct {
+    char db[PATH_MAX + 1];      /* directory for tman metadata */
+    char base[PATH_MAX + 1];    /* directory for all stuff above */
+};
 
-static int check_args(tman_arg_t * args)
+static int fill_sysvars(const char *taskdir, struct tmanstruct *tmanfs)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)))
-        return status;
-    else if ((status = tman_check_arg_brd(args)))
-        return status;
-    else if ((status = tman_check_arg_task(args)))
-        return status;
-    return status;
-}
-
-static int project_check_board(char *base, tman_arg_t * args)
-{
-    char *pathname = path_prj_board(base, args);
-    return ISFILE(pathname);
-}
-
-static int project_add_board(char *base, tman_arg_t * args)
-{
-    char *pathname = path_prj_board(base, args);
-    return TOUCH(pathname);
-}
-
-static int project_exist(char *base, tman_arg_t * args)
-{
-    char *pathname = path_prj_dir(base, args);
-    return ISDIR(pathname);
-}
-
-static int board_exist(char *base, tman_arg_t * args)
-{
-    char *pathname = path_brd_dir(base, args);
-    return ISDIR(pathname);
-}
-
-static int task_exist(char *base, const tman_arg_t * args)
-{
-    char *pathname = path_task_dir(base, args);
-    return ISDIR(pathname);
-}
-
-static int fill_sysvars(tman_base_t * base)
-{
-    sprintf(tmanfs.base, "%s", base->task);
-    sprintf(tmanfs.db, "%s/%s", base->task, ".tman");
+    sprintf(tmanfs->base, "%s", taskdir);
+    sprintf(tmanfs->db, "%s/%s", taskdir, ".tman");
     return LIBTMAN_OK;
 }
 
-int tman_check_arg_brd_exist(tman_arg_t * args)
+int tman_project_exist(const char *taskdir, tman_arg_t * args)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)))
-        return status;
-    else if ((status = tman_check_arg_brd(args)))
-        return status;
-    else if (board_exist(tmanfs.base, args) == FALSE)
-        return emod_set(LIBTMAN_BRD_NOSUCH);
-    return LIBTMAN_OK;
+    char *pathname = path_project_dir(taskdir, args);
+    return ISDIR(pathname) == TRUE ? LIBTMAN_OK : LIBTMAN_PRJ_NOSUCH;
 }
 
-int tman_check_arg_task_exist(tman_arg_t * args)
+int tman_board_exist(const char *taskdir, tman_arg_t * args)
 {
-    int status;
-
-    if ((status = check_args(args)))
-        return emod_set(status);
-    if (task_exist(tmanfs.base, args) == FALSE)
-        return emod_set(LIBTMAN_ID_NOSUCH);
-    return LIBTMAN_OK;
+    char *pathname = path_board_dir(taskdir, args);
+    return ISDIR(pathname) == TRUE ? LIBTMAN_OK : LIBTMAN_BRD_NOSUCH;
 }
 
-int tman_check_arg_prj(tman_arg_t * args)
+int tman_task_exist(const char *taskdir, tman_arg_t * args)
+{
+    char *pathname = path_task_dir(taskdir, args);
+    return ISDIR(pathname) == TRUE ? LIBTMAN_OK : LIBTMAN_ID_NOSUCH;
+}
+
+int tman_project_valid(const char *taskdir, tman_arg_t * args)
 {
     if (valid_project_name(args->project) == FALSE)
         return emod_set(LIBTMAN_PRJ_ILLEG);
-    else if (project_exist(tmanfs.base, args) == FALSE)
-        return emod_set(LIBTMAN_PRJ_NOSUCH);
-    else if (project_check_board(tmanfs.base, args) == FALSE)
-        return emod_set(LIBTMAN_PRJ_BOARD_CHECK);
     return LIBTMAN_OK;
 }
 
-int tman_check_arg_brd(tman_arg_t * args)
+int tman_board_valid(const char *taskdir, tman_arg_t * args)
 {
     if (valid_board_name(args->board) == FALSE)
         return emod_set(LIBTMAN_BRD_ILLEG);
-    else if (board_exist(tmanfs.base, args) == FALSE)
-        return emod_set(LIBTMAN_BRD_NOSUCH);
     return LIBTMAN_OK;
 }
 
-int tman_check_arg_task(tman_arg_t * args)
+int tman_task_valid(const char *taskdir, tman_arg_t * args)
 {
     if (valid_task_name(args->taskid) == FALSE)
         return emod_set(LIBTMAN_ID_ILLEG);
-    else if (task_exist(tmanfs.base, args) == FALSE)
-        return emod_set(LIBTMAN_ID_NOSUCH);
     return LIBTMAN_OK;
 }
 
-int tman_make_db(void)
+int tman_make_db(const char *taskdir)
 {
-    if (MKDIR(tmanfs.base))
+    struct tmanstruct tmanfs;
+
+    if (fill_sysvars(taskdir, &tmanfs))
+        return emod_set(LIBTMAN_ESYSVAR);
+    else if (MKDIR(tmanfs.base))
         return emod_set(LIBTMAN_SYS_FS);
     else if (MKDIR(tmanfs.db))
         return emod_set(LIBTMAN_SYS_FS);
     return LIBTMAN_OK;
 }
 
-int tman_check_db(void)
+int tman_check_db(const char *taskdir)
 {
-    if (!ISDIR(tmanfs.db))
+    struct tmanstruct tmanfs;
+
+    if (fill_sysvars(taskdir, &tmanfs))
+        return emod_set(LIBTMAN_ESYSVAR);
+    else if (!ISDIR(tmanfs.db))
         return emod_set(LIBTMAN_DB);
     return LIBTMAN_OK;
 }
 
-int tman_init(tman_base_t * base)
+int tman_task_add(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    if (fill_sysvars(base))
-        return emod_set(LIBTMAN_ESYSVAR);
-    return LIBTMAN_OK;
-}
-
-int tman_task_add(tman_ctx_t * ctx, tman_arg_t * args)
-{
-    int status;
-
-    if ((status = tman_check_arg_prj(args)))
-        return emod_set(status);
-    else if ((status = tman_check_arg_brd(args)))
-        return emod_set(status);
-    else if (valid_task_name(args->taskid) == FALSE)
-        return emod_set(LIBTMAN_ID_ILLEG);
-    else if (task_exist(tmanfs.base, args) == TRUE)
-        return emod_set(LIBTMAN_ID_EXISTS);
-
-    if (dir_task_add(tmanfs.base, args) != 0)
+    if (dir_task_add(taskdir, args) != 0)
         return emod_set(LIBTMAN_DIR_ID_MAKE);
-    else if (unit_save(path_task_unit(tmanfs.base, args), ctx->units))
+    else if (unit_save(path_task_unit(taskdir, args), ctx->units))
         return emod_set(LIBTMAN_UNIT_SAVE);
-    else if (unit_save(path_task_column(tmanfs.base, args), ctx->column))
+    else if (unit_save(path_task_column(taskdir, args), ctx->column))
         return emod_set(LIBTMAN_COLUMN_SAVE);
     return LIBTMAN_OK;
 }
 
-int tman_task_del(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_task_del(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = check_args(args)))
-        return status;
-
-    if (dir_task_del(tmanfs.base, args))
+    if (dir_task_del(taskdir, args))
         return emod_set(LIBTMAN_DIR_ID_DEL);
     return LIBTMAN_OK;
 }
 
-int tman_task_get(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_task_get(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = check_args(args)))
-        return status;
-
-    if ((ctx->units = unit_load(path_task_unit(tmanfs.base, args))) == NULL)
-        status = LIBTMAN_UNIT_GET;
-    return status;
+    if ((ctx->units = unit_load(path_task_unit(taskdir, args))) == NULL)
+        return emod_set(LIBTMAN_DIR_ID_DEL);
+    return LIBTMAN_OK;
 }
 
-int tman_task_list(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_task_list(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)) != LIBTMAN_OK)
-        return status;
-    else if ((status = tman_check_arg_brd(args)) != LIBTMAN_OK)
-        return status;
-    return aux_list_get(ctx, path_brd_dir(tmanfs.base, args));
+    return aux_list_get(ctx, path_board_dir(taskdir, args));
 }
 
-int tman_task_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
+int tman_task_move(const char *taskdir, tman_arg_t * src, tman_arg_t * dst,
+                   tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = check_args(src)))
-        return emod_set(status);
-    else if (valid_task_name(dst->taskid) == FALSE)
-        return emod_set(LIBTMAN_ID_ILLEG);
-    else if (task_exist(tmanfs.base, dst) == TRUE)
-        return emod_set(LIBTMAN_ID_EXISTS);
-
-    if (dir_task_move(tmanfs.base, src, dst))
+    if (dir_task_move(taskdir, src, dst))
         return emod_set(LIBTMAN_DIR_ID_MOVE);
     return LIBTMAN_OK;
 }
 
-int tman_task_set(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_task_set(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = check_args(args)))
-        return status;
-    return aux_unit_set(ctx->units, path_task_unit(tmanfs.base, args));
+    return aux_unit_set(ctx->units, path_task_unit(taskdir, args));
 }
 
-int tman_task_column_get(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_task_column_get(const char *taskdir, tman_arg_t * args,
+                         tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = check_args(args)))
-        return status;
-
-    if ((ctx->column = unit_load(path_task_column(tmanfs.base, args))) == NULL)
-        status = LIBTMAN_COLUMN_GET;
-
-    return status;
+    if ((ctx->column = unit_load(path_task_column(taskdir, args))) == NULL)
+        return LIBTMAN_COLUMN_GET;
+    return LIBTMAN_OK;
 }
 
-int tman_task_column_set(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_task_column_set(const char *taskdir, tman_arg_t * args,
+                         tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = check_args(args)))
-        return status;
-    return aux_unit_set(ctx->column, path_task_column(tmanfs.base, args));
+    return aux_unit_set(ctx->column, path_task_column(taskdir, args));
 }
 
-int tman_board_add(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_board_add(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)))
-        return emod_set(status);
-    else if (valid_board_name(args->project) == FALSE)
-        return emod_set(LIBTMAN_BRD_ILLEG);
-    else if (board_exist(tmanfs.base, args) == TRUE)
-        return emod_set(LIBTMAN_BRD_EXISTS);
-
-    if (dir_brd_add(tmanfs.base, args))
+    if (dir_board_add(taskdir, args))
         return emod_set(LIBTMAN_DIR_BRD_MAKE);
-    else if (unit_save(path_brd_unit(tmanfs.base, args), ctx->units))
+    else if (unit_save(path_board_unit(taskdir, args), ctx->units))
         return emod_set(LIBTMAN_UNIT_SAVE);
-    else if (unit_save(path_brd_column(tmanfs.base, args), ctx->column))
+    else if (unit_save(path_board_column(taskdir, args), ctx->column))
         return emod_set(LIBTMAN_COLUMN_SAVE);
     return LIBTMAN_OK;
 }
 
-int tman_board_del(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_board_del(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)))
-        return status;
-    else if ((status = tman_check_arg_brd(args)))
-        return status;
-
-    if (dir_brd_del(tmanfs.base, args))
+    if (dir_board_del(taskdir, args))
         return emod_set(LIBTMAN_DIR_BRD_DEL);
     return LIBTMAN_OK;
 }
 
-int tman_board_get(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_board_get(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)))
-        return status;
-    else if ((status = tman_check_arg_brd(args)))
-        return status;
-
-    if ((ctx->units = unit_load(path_brd_unit(tmanfs.base, args))) == NULL)
+    if ((ctx->units = unit_load(path_board_unit(taskdir, args))) == NULL)
         return emod_set(LIBTMAN_UNIT_LOAD);
     return LIBTMAN_OK;
 }
 
-int tman_board_list(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_board_list(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)) != LIBTMAN_OK)
-        return status;
-    else if ((status = tman_check_arg_brd(args)) != LIBTMAN_OK)
-        return status;
-    return aux_list_get(ctx, path_prj_dir(tmanfs.base, args));
+    return aux_list_get(ctx, path_project_dir(taskdir, args));
 }
 
-int tman_board_move(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
+int tman_board_move(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
     return 0;
 }
 
-int tman_board_set(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_board_set(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = check_args(args)))
-        return status;
-    return aux_unit_set(ctx->units, path_brd_unit(tmanfs.base, args));
+    return aux_unit_set(ctx->units, path_board_unit(taskdir, args));
 }
 
-int tman_board_column_set(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_board_column_set(const char *taskdir, tman_arg_t * args,
+                          tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)))
-        return status;
-    else if ((status = tman_check_arg_brd(args)))
-        return status;
-
-    if (unit_save(path_brd_column(tmanfs.base, args), ctx->column))
+    if (unit_save(path_board_column(taskdir, args), ctx->column))
         return emod_set(LIBTMAN_UNIT_SAVE);
     return LIBTMAN_OK;
 }
 
-int tman_project_add(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_project_add(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    if (valid_project_name(args->project) == FALSE)
-        return emod_set(LIBTMAN_PRJ_ILLEG);
-    else if (project_exist(tmanfs.base, args) == TRUE)
-        return emod_set(LIBTMAN_PRJ_EXISTS);
-    // TODO: check board support
-
-    if (dir_prj_add(tmanfs.base, args))
+    if (dir_project_add(taskdir, args))
         return emod_set(LIBTMAN_DIR_PRJ_MAKE);
-    else if (project_add_board(tmanfs.base, args))
-        return emod_set(LIBTMAN_PRJ_BOARD_ADD);
-    else if (unit_save(path_prj_unit(tmanfs.base, args), ctx->units))
+    else if (unit_save(path_project_unit(taskdir, args), ctx->units))
         return emod_set(LIBTMAN_UNIT_SAVE);
-    else if (unit_save(path_prj_column(tmanfs.base, args), ctx->column))
+    else if (unit_save(path_project_column(taskdir, args), ctx->column))
         return emod_set(LIBTMAN_UNIT_SAVE);
     return LIBTMAN_OK;
 }
 
-int tman_project_del(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_project_del(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)))
-        return status;
-
-    if (dir_prj_del(tmanfs.base, args))
+    if (dir_project_del(taskdir, args))
         return emod_set(LIBTMAN_DIR_PRJ_DEL);
     return LIBTMAN_OK;
 }
 
-int tman_project_get(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_project_get(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)))
-        return status;
-
-    if ((ctx->units = unit_load(path_prj_unit(tmanfs.base, args))) == NULL)
+    if ((ctx->units = unit_load(path_project_unit(taskdir, args))) == NULL)
         return emod_set(LIBTMAN_UNIT_LOAD);
     return LIBTMAN_OK;
 }
 
-int tman_project_list(tman_ctx_t * ctx)
+int tman_project_list(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    return aux_list_get(ctx, tmanfs.base);
+    return aux_list_get(ctx, taskdir);
 }
 
-int tman_project_rename(tman_ctx_t * ctx, tman_arg_t * src, tman_arg_t * dst)
+int tman_project_rename(const char *taskdir, tman_arg_t * src, tman_arg_t * dst,
+                        tman_ctx_t * ctx)
 {
-    int status;
-
-    /* TODO: Use tman_check_arg_prj() to remove code duplication.  */
-    if ((status = tman_check_arg_prj(src)))
-        return emod_set(status);
-    else if ((status = tman_check_arg_prj(dst))
-             && status != LIBTMAN_PRJ_NOSUCH)
-        return emod_set(status);
-    else if (project_exist(tmanfs.base, dst))
-        return emod_set(LIBTMAN_PRJ_EXISTS);
-    else if (valid_project_name(dst->project) == FALSE)
-        return emod_set(LIBTMAN_PRJ_ILLEG);
-
-    if (dir_prj_rename(tmanfs.base, src, dst))
+    if (dir_project_rename(taskdir, src, dst))
         return emod_set(LIBTMAN_DIR_PRJ_RENAME);
     return LIBTMAN_OK;
 }
 
-int tman_project_set(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_project_set(const char *taskdir, tman_arg_t * args, tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = check_args(args)))
-        return status;
-    return aux_unit_set(ctx->units, path_prj_unit(tmanfs.base, args));
+    return aux_unit_set(ctx->units, path_project_unit(taskdir, args));
 }
 
-int tman_project_column_set(tman_ctx_t * ctx, tman_arg_t * args)
+int tman_project_column_set(const char *taskdir, tman_arg_t * args,
+                            tman_ctx_t * ctx)
 {
-    int status;
-
-    if ((status = tman_check_arg_prj(args)))
-        return status;
-
-    if (unit_save(path_prj_column(tmanfs.base, args), ctx->column))
+    if (unit_save(path_project_column(taskdir, args), ctx->column))
         return emod_set(LIBTMAN_UNIT_SAVE);
     return LIBTMAN_OK;
 }
@@ -428,7 +251,8 @@ tman_unit_t *tman_unit_add(struct tman_unit *head, char *key, char *val)
 
 int tman_unit_set(struct tman_unit *head, char *key, char *val)
 {
-    return unit_set(head, key, val);
+    // TODO: this will never fail, cuz in case of error it returns head.
+    return !unit_set(head, key, val) ? LIBTMAN_OK : LIBTMAN_UNIT_SET;
 }
 
 int tman_unit_save(const char *filename, tman_unit_t * units)
@@ -461,11 +285,4 @@ void *tman_list_free(tman_list_t * list)
 char *tman_strerror(int errnum)
 {
     return emod_strerror(errnum);
-}
-
-void tman_deinit(tman_ctx_t * ctx)
-{
-    unit_free(ctx->units);
-    unit_free(ctx->column);
-    list_free(ctx->list);
 }

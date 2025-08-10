@@ -3,16 +3,16 @@
 
 #include "libtman.h"
 
-int dir_prj_add(char *base, tman_arg_t * args);
-int dir_prj_del(char *base, tman_arg_t * args);
-int dir_prj_rename(char *base, tman_arg_t * src, tman_arg_t * dst);
+int dir_project_add(const char *taskdir, tman_arg_t * args);
+int dir_project_del(const char *taskdir, tman_arg_t * args);
+int dir_project_rename(const char *taskdir, tman_arg_t * src, tman_arg_t * dst);
 
-int dir_brd_add(char *base, tman_arg_t * args);
-int dir_brd_del(char *base, tman_arg_t * args);
-int dir_brd_move(char *base, tman_arg_t * src, tman_arg_t * dst);
+int dir_board_add(const char *taskdir, tman_arg_t * args);
+int dir_board_del(const char *taskdir, tman_arg_t * args);
+int dir_board_move(const char *taskdir, tman_arg_t * src, tman_arg_t * dst);
 
-int dir_task_add(char *base, tman_arg_t * args);
-int dir_task_del(char *base, tman_arg_t * args);
-int dir_task_move(char *base, tman_arg_t * src, tman_arg_t * dst);
+int dir_task_add(const char *taskdir, tman_arg_t * args);
+int dir_task_del(const char *taskdir, tman_arg_t * args);
+int dir_task_move(const char *taskdir, tman_arg_t * src, tman_arg_t * dst);
 
 #endif
